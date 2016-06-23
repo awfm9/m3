@@ -16,20 +16,20 @@ const (
 func main() {
 
 	// define configuration parameters
-	level := pflag.StringP("level", "l", "INFO", "leg level")
+	level := pflag.StringP("level", "l", "INFO", "log level")
 	pflag.Parse()
 
 	// initialize logger
-	logLevel, err := logger.ParseLevel(*level)
+	lvl, err := logger.ParseLevel(*level)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "FAILED TO INITIALIZE LOGGER: %v", err)
+		fmt.Fprintf(os.Stderr, "FAILED TO INITIALIZE LOGGER (%v)\n", err)
 		os.Exit(1)
 	}
-	logger := logger.New(logLevel)
+	lgr := logger.New(lvl)
 
-	logger.Infof("starting m3 daemon version %v", version)
+	lgr.Infof("starting m3 daemon version %v", version)
 
-	logger.Infof("shutting down m3 daemon")
+	lgr.Infof("shutting down m3 daemon")
 
 	os.Exit(0)
 }
