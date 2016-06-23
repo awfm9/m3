@@ -62,7 +62,7 @@ func (l *Logger) Write(bytes []byte) (int, error) {
 
 // output will print a message with a given level.
 func (l *Logger) output(level Level, prefix string, format string, v ...interface{}) {
-	if l.level <= level {
+	if level <= l.level {
 		format = fmt.Sprintf("%v %v", prefix, format)
 		l.logger.Printf(format, v...)
 	}
