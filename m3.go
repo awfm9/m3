@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
 	"os/user"
 	"path"
+	"syscall"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/common"
@@ -85,9 +87,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	// wait for signal to shut down
+	sigc := make(chan os.Signal)
+	signal.Notify(sigc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	<-sigc
+
 	lgr.Infof("shutting down m3 daemon")
 
-	matcher.Wait()
+	matcher.Stop()
 
 	os.Exit(0)
 }

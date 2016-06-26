@@ -1,10 +1,6 @@
 package business
 
-import (
-	"time"
-
-	"github.com/awishformore/m3/contract"
-)
+import "github.com/awishformore/m3/contract"
 
 // Matcher is a market matcher that will try to match overlapping orders against
 // each other.
@@ -16,7 +12,7 @@ func NewMatcher(market *contract.SimpleMarket, proxy *contract.TradeProxy) (*Mat
 	return &Matcher{}, nil
 }
 
-// Wait will wait for the matcher to finish.
-func (m *Matcher) Wait() {
-	time.Sleep(time.Second)
+// Stop will end the execution loop of the matcher and return after cleanly
+// shutting down.
+func (m *Matcher) Stop() {
 }
