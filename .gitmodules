@@ -1,6 +1,0 @@
-[submodule "module/maker-otc"]
-	path = module/maker-otc
-	url = https://github.com/MakerDAO/maker-otc
-[submodule "module/erc20"]
-	path = module/erc20
-	url = https://github.com/nexusdev/erc20

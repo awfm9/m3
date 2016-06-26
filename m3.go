@@ -12,6 +12,7 @@ import (
 	"github.com/ogier/pflag"
 
 	"github.com/awishformore/m3/adaptor/logger"
+	"github.com/awishformore/m3/business"
 	"github.com/awishformore/m3/contract"
 )
 
@@ -25,6 +26,7 @@ func main() {
 	testnet := pflag.BoolP("testnet", "t", true, "use testnet network")
 	level := pflag.StringP("level", "l", "INFO", "log level")
 	market := pflag.StringP("market", "m", "0x5661e7bc2403c7cc08df539e4a8e2972ec256d11", "Maker Market contract address")
+	proxy := pflag.StringP("proxy", "p", "0x5661e7bc2403c7cc08df539e4a8e2972ec256d12", "Trade Proxy contract address")
 	pflag.Parse()
 
 	// initialize logger
@@ -63,15 +65,29 @@ func main() {
 	be := backends.NewRPCBackend(conn)
 
 	// bind maker market contract
-	otc, err := contract.NewToken(common.HexToAddress(*market), be)
+	otc, err := contract.NewSimpleMarket(common.HexToAddress(*market), be)
 	if err != nil {
 		lgr.Criticalf("could not bind to market contract (%v)", err)
 		os.Exit(1)
 	}
 
-	_ = otc
+	// bind trade proxy contract
+	pxy, err := contract.NewTradeProxy(common.HexToAddress(*proxy), be)
+	if err != nil {
+		lgr.Criticalf("could not bind to trading proxy contract (%v)", err)
+		os.Exit(1)
+	}
+
+	// initialize matcher logic
+	matcher, err := business.NewMatcher(otc, pxy)
+	if err != nil {
+		lgr.Criticalf("could not initialize market matcher (%v)", err)
+		os.Exit(1)
+	}
 
 	lgr.Infof("shutting down m3 daemon")
+
+	matcher.Wait()
 
 	os.Exit(0)
 }
