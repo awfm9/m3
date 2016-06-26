@@ -2,6 +2,7 @@ package adaptor
 
 import (
 	"fmt"
+	"math/big"
 
 	"github.com/awishformore/m3/contract"
 	"github.com/awishformore/m3/model"
@@ -11,17 +12,18 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
-// BlockchainDefault implements a blockchain interface using a market contract
-// and a proxy contract for trading atomically.
-type BlockchainDefault struct {
+// AtomicMarket uses a market contract and a simple proxy contract to execute
+// trades on the given blockchain in an atomic way.
+type AtomicMarket struct {
 	conn    rpc.Client
 	backend bind.ContractBackend
+	address common.Address
 	market  *contract.SimpleMarket
 	proxy   *contract.TradeProxy
 }
 
-// NewBlockchain creates a new default blockchain wrapper.
-func NewBlockchain(ipc string, marketAddress string, proxyAddress string) (*BlockchainDefault, error) {
+// NewAtomicMarket creates a new default blockchain wrapper.
+func NewAtomicMarket(ipc string, marketAddress string, proxyAddress string) (*AtomicMarket, error) {
 
 	// initialize connection to the geth node
 	conn, err := rpc.NewIPCClient(ipc)
@@ -42,9 +44,10 @@ func NewBlockchain(ipc string, marketAddress string, proxyAddress string) (*Bloc
 		return nil, fmt.Errorf("could not bind trade proxy contract: %v (%v)", proxyAddress, err)
 	}
 
-	bc := BlockchainDefault{
+	bc := AtomicMarket{
 		conn:    conn,
 		backend: backend,
+		address: common.HexToAddress(marketAddress),
 		market:  market,
 		proxy:   proxy,
 	}
@@ -53,18 +56,18 @@ func NewBlockchain(ipc string, marketAddress string, proxyAddress string) (*Bloc
 }
 
 // Close will free up the resources associated with the blockchain wrapper.
-func (bc *BlockchainDefault) Close() {
-	bc.conn.Close()
+func (am *AtomicMarket) Close() {
+	am.conn.Close()
 }
 
-// GetOrders will get a slice of all orders on the market given.
-func (bc *BlockchainDefault) GetOrders() ([]*model.Order, error) {
+// Orders will get a slice of all orders on the market given.
+func (am *AtomicMarket) Orders() ([]*model.Order, error) {
 
 	// slice to hold valid orders
 	orders := []*model.Order{}
 
 	// get the last order ID to iterate through all existing orders
-	id, err := bc.market.Last_offer_id(nil)
+	id, err := am.market.Last_offer_id(nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not retrieve last offer ID (%v)", err)
 	}
@@ -73,7 +76,7 @@ func (bc *BlockchainDefault) GetOrders() ([]*model.Order, error) {
 	for id.Sign() > 0 {
 
 		// get the info for this order
-		info, err := bc.market.Offers(nil, id)
+		info, err := am.market.Offers(nil, id)
 		if err != nil {
 			return nil, fmt.Errorf("could not get order info: %v (%v)", id, err)
 		}
@@ -97,4 +100,16 @@ func (bc *BlockchainDefault) GetOrders() ([]*model.Order, error) {
 	}
 
 	return orders, nil
+}
+
+// Trade will execute the trades with the two given orders.
+func (am *AtomicMarket) Trade(firstID *big.Int, secondID *big.Int) error {
+
+	// execute the trades using the market proxy
+	_, err := am.proxy.Trade(nil, am.address, firstID, secondID)
+	if err != nil {
+		return fmt.Errorf("could not atomically execute trades (%v)", err)
+	}
+
+	return nil
 }

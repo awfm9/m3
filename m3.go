@@ -34,7 +34,7 @@ func main() {
 	// define configuration parameters
 	level := pflag.StringP("level", "l", "INFO", "log level")
 	ipc := pflag.StringP("ipc", "i", path.Join(usr.HomeDir, ".ethereum", "testnet", "geth.ipc"), "IPC endpoint for Ethereum node")
-	market := pflag.StringP("market", "m", "0x5661e7bc2403c7cc08df539e4a8e2972ec256d11", "Maker Market contract address")
+	maker := pflag.StringP("maker", "m", "0x5661e7bc2403c7cc08df539e4a8e2972ec256d11", "Maker Market contract address")
 	proxy := pflag.StringP("proxy", "p", "0x5661e7bc2403c7cc08df539e4a8e2972ec256d12", "Trade Proxy contract address")
 	pflag.Parse()
 
@@ -49,14 +49,14 @@ func main() {
 	lgr.Infof("starting m3 daemon...")
 
 	// initialize the blockchain wrapper with the contract addresses
-	blockchain, err := adaptor.NewBlockchain(*ipc, *market, *proxy)
+	market, err := adaptor.NewAtomicMarket(*ipc, *maker, *proxy)
 	if err != nil {
 		lgr.Criticalf("could not initialize the blockchain wrapper (%v)", err)
 		os.Exit(1)
 	}
 
 	// initialize matcher logic
-	matcher, err := business.NewMatcher(blockchain)
+	matcher, err := business.NewMatcher(market)
 	if err != nil {
 		lgr.Criticalf("could not initialize market matcher (%v)", err)
 		os.Exit(1)
@@ -71,8 +71,9 @@ func main() {
 
 	lgr.Infof("shutting down m3 daemon...")
 
+	// stop execution & free resources on relevant modules
 	matcher.Stop()
-	blockchain.Close()
+	market.Close()
 
 	lgr.Infof("m3 daemon shutdown complete")
 

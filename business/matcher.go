@@ -8,7 +8,7 @@ type Matcher struct {
 }
 
 // NewMatcher creates a new market matcher that will try to execute trades against each other.
-func NewMatcher(blockchain adaptor.Blockchain) (*Matcher, error) {
+func NewMatcher(market adaptor.Market) (*Matcher, error) {
 	return &Matcher{}, nil
 }
 
