@@ -24,6 +24,9 @@ const (
 
 func main() {
 
+	// print version info
+	fmt.Fprintf(os.Stderr, "M3 DAEMON V%v\n", version)
+
 	// define configuration parameters
 	testnet := pflag.BoolP("testnet", "t", true, "use testnet network")
 	level := pflag.StringP("level", "l", "INFO", "log level")
@@ -39,7 +42,7 @@ func main() {
 	}
 	lgr := logger.New(lvl)
 
-	lgr.Infof("starting m3 daemon version %v", version)
+	lgr.Infof("starting m3 daemon...")
 
 	// get current user
 	usr, err := user.Current()
@@ -87,14 +90,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	lgr.Infof("m3 daemon startup complete")
+
 	// wait for signal to shut down
 	sigc := make(chan os.Signal)
 	signal.Notify(sigc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	<-sigc
 
-	lgr.Infof("shutting down m3 daemon")
+	lgr.Infof("shutting down m3 daemon...")
 
 	matcher.Stop()
+
+	lgr.Infof("m3 daemon shutdown complete")
 
 	os.Exit(0)
 }
