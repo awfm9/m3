@@ -36,22 +36,22 @@ func New(level Level) *Logger {
 }
 
 // ParseLevel parses a level from string to log level.
-func ParseLevel(level string) (Level, error) {
+func ParseLevel(level string) Level {
 	switch level {
 	case "CRITICAL":
-		return Critical, nil
+		return Critical
 	case "ERROR":
-		return Error, nil
+		return Error
 	case "WARNING":
-		return Warning, nil
+		return Warning
 	case "NOTICE":
-		return Notice, nil
+		return Notice
 	case "INFO":
-		return Info, nil
+		return Info
 	case "DEBUG":
-		return Debug, nil
+		return Debug
 	default:
-		return Debug, fmt.Errorf("invalid logging level: %v", level)
+		return Debug
 	}
 }
 
@@ -60,40 +60,50 @@ func (l *Logger) Write(bytes []byte) (int, error) {
 	return fmt.Fprintf(os.Stderr, "%v %v", time.Now().UTC().Format(time.RFC3339), string(bytes))
 }
 
-// output will print a message with a given level.
-func (l *Logger) output(level Level, prefix string, format string, v ...interface{}) {
-	if level <= l.level {
-		format = fmt.Sprintf("%v %v", prefix, format)
-		l.logger.Printf(format, v...)
-	}
-}
-
 // Criticalf logs a critical message.
 func (l *Logger) Criticalf(format string, v ...interface{}) {
-	l.output(Critical, "[CRITICAL]", format, v...)
+	if l.level >= Critical {
+		format = "[CRITICAL] " + format
+		l.logger.Output(2, fmt.Sprintf(format, v...))
+	}
 }
 
 // Errorf logs an error message.
 func (l *Logger) Errorf(format string, v ...interface{}) {
-	l.output(Error, "[ERROR]", format, v...)
+	if l.level >= Error {
+		format = "[ERROR] " + format
+		l.logger.Output(2, fmt.Sprintf(format, v...))
+	}
 }
 
 // Warningf logs a warning message.
 func (l *Logger) Warningf(format string, v ...interface{}) {
-	l.output(Warning, "[WARNING]", format, v...)
+	if l.level >= Warning {
+		format = "[WARNING] " + format
+		l.logger.Output(2, fmt.Sprintf(format, v...))
+	}
 }
 
 // Noticef logs a notice message.
 func (l *Logger) Noticef(format string, v ...interface{}) {
-	l.output(Notice, "[NOTICE]", format, v...)
+	if l.level >= Notice {
+		format = "[NOTICE] " + format
+		l.logger.Output(2, fmt.Sprintf(format, v...))
+	}
 }
 
 // Infof logs an info message.
 func (l *Logger) Infof(format string, v ...interface{}) {
-	l.output(Info, "[INFO]", format, v...)
+	if l.level >= Info {
+		format = "[INFO] " + format
+		l.logger.Output(2, fmt.Sprintf(format, v...))
+	}
 }
 
 // Debugf logs a debug message.
 func (l *Logger) Debugf(format string, v ...interface{}) {
-	l.output(Debug, "[DEBUG]", format, v...)
+	if l.level >= Debug {
+		format = "[DEBUG] " + format
+		l.logger.Output(2, fmt.Sprintf(format, v...))
+	}
 }
