@@ -45,7 +45,6 @@ func NewMatcher(log *logger.Logger, market adaptor.Market, interval time.Duratio
 		market:   market,
 		done:     make(chan struct{}),
 		interval: interval,
-		books:    make(map[string]*Book),
 	}
 
 	return &m
@@ -98,6 +97,9 @@ MatcherLoop:
 }
 
 func (m *Matcher) getOrders() error {
+
+	// clear all books
+	m.books = make(map[string]*Book)
 
 	// retrieve valid orders from contract
 	orders, err := m.market.Orders()
