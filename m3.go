@@ -7,6 +7,7 @@ import (
 	"os/user"
 	"path"
 	"syscall"
+	"time"
 
 	"github.com/ogier/pflag"
 
@@ -36,6 +37,7 @@ func main() {
 	ipc := pflag.StringP("ipc", "i", path.Join(usr.HomeDir, ".ethereum", "testnet", "geth.ipc"), "IPC endpoint for Ethereum node")
 	maker := pflag.StringP("maker", "m", "0x5661e7bc2403c7cc08df539e4a8e2972ec256d11", "Maker Market contract address")
 	proxy := pflag.StringP("proxy", "p", "0x5661e7bc2403c7cc08df539e4a8e2972ec256d12", "Trade Proxy contract address")
+	interval := pflag.DurationP("interval", "t", time.Second*14, "interval to check poll for new orders on market")
 	pflag.Parse()
 
 	// initialize logger
@@ -44,38 +46,34 @@ func main() {
 		fmt.Fprintf(os.Stderr, "FAILED TO INITIALIZE LOGGER (%v)\n", err)
 		os.Exit(1)
 	}
-	lgr := logger.New(lvl)
+	log := logger.New(lvl)
 
-	lgr.Infof("starting m3 daemon...")
+	log.Infof("starting m3 daemon...")
 
 	// initialize the blockchain wrapper with the contract addresses
 	market, err := adaptor.NewAtomicMarket(*ipc, *maker, *proxy)
 	if err != nil {
-		lgr.Criticalf("could not initialize the blockchain wrapper (%v)", err)
+		log.Criticalf("could not initialize the blockchain wrapper (%v)", err)
 		os.Exit(1)
 	}
 
 	// initialize matcher logic
-	matcher, err := business.NewMatcher(market)
-	if err != nil {
-		lgr.Criticalf("could not initialize market matcher (%v)", err)
-		os.Exit(1)
-	}
+	matcher := business.NewMatcher(log, market, *interval)
 
-	lgr.Infof("m3 daemon startup complete")
+	log.Infof("m3 daemon startup complete")
 
 	// wait for signal to shut down
 	sigc := make(chan os.Signal)
 	signal.Notify(sigc, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	<-sigc
 
-	lgr.Infof("shutting down m3 daemon...")
+	log.Infof("shutting down m3 daemon...")
 
 	// stop execution & free resources on relevant modules
 	matcher.Stop()
 	market.Close()
 
-	lgr.Infof("m3 daemon shutdown complete")
+	log.Infof("m3 daemon shutdown complete")
 
 	os.Exit(0)
 }

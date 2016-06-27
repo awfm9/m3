@@ -89,10 +89,10 @@ func (am *AtomicMarket) Orders() ([]*model.Order, error) {
 		// build an order struct from the info
 		order := model.Order{
 			ID:         id,
-			SellAmount: info.Sell_how_much,
-			SellToken:  info.Sell_which_token.Hex(),
 			BuyAmount:  info.Buy_how_much,
 			BuyToken:   info.Buy_which_token.Hex(),
+			SellAmount: info.Sell_how_much,
+			SellToken:  info.Sell_which_token.Hex(),
 		}
 
 		// append the order
