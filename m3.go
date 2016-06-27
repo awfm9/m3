@@ -11,9 +11,10 @@ import (
 
 	"github.com/ogier/pflag"
 
+	"github.com/awishformore/logger"
+
 	"github.com/awishformore/m3/adaptor"
 	"github.com/awishformore/m3/business"
-	"github.com/awishformore/m3/infrastructure/logger"
 )
 
 const (
@@ -41,11 +42,7 @@ func main() {
 	pflag.Parse()
 
 	// initialize logger
-	lvl, err := logger.ParseLevel(*level)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "FAILED TO INITIALIZE LOGGER (%v)\n", err)
-		os.Exit(1)
-	}
+	lvl := logger.ParseLevel(*level)
 	log := logger.New(lvl)
 
 	log.Infof("starting m3 daemon...")

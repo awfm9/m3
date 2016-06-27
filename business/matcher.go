@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/awishformore/logger"
+
 	"github.com/awishformore/m3/adaptor"
-	"github.com/awishformore/m3/infrastructure/logger"
 )
 
 // Matcher is a market matcher that will try to match overlapping orders against
