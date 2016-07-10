@@ -1,5 +1,10 @@
 contract TradeProxy {
 
+  // default function to reject any non-function transactions
+  function() {
+    throw;
+  }
+
   // trade will execute a trade on the given maker market for the given tokens.
   function trade(SimpleMarket market, uint firstId, uint secondId) {
 
@@ -21,8 +26,10 @@ contract TradeProxy {
       throw;
     }
     if (firstBuyAmount > firstAvailableAmount) {
+      firstBuyToken.approve(address(market), firstAvailableAmount);
       market.buyPartial(firstId, firstAvailableAmount * firstBuyAmount / firstSellAmount);
     } else {
+      firstBuyToken.approve(address(market), firstBuyAmount);
       market.buy(firstId);
     }
 
@@ -32,8 +39,10 @@ contract TradeProxy {
       throw;
     }
     if (secondBuyAmount > secondAvailableAmount) {
+      secondBuyToken.approve(address(market), secondAvailableAmount);
       market.buyPartial(secondId, secondAvailableAmount * secondBuyAmount / secondSellAmount);
     } else {
+      secondBuyToken.approve(address(market), secondBuyAmount);
       market.buy(secondId);
     }
   }
