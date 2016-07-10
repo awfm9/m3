@@ -133,8 +133,25 @@ Loop:
 			cost := new(big.Int)
 			changes := make(map[common.Address]*big.Int)
 			for _, twin := range twins {
+
+				// add cost
 				cost.Add(cost, twin.Cost)
 
+				// check if change in token exists, if not create, then add
+				first, ok := changes[twin.First.Token]
+				if !ok {
+					first = big.NewInt(0)
+					changes[twin.First.Token] = first
+				}
+				first.Add(first, twin.First.Amount)
+
+				// check if change in second token exists, if not create and add
+				second, ok := changes[twin.Second.Token]
+				if !ok {
+					second = big.NewInt(0)
+					changes[twin.Second.Token] = second
+				}
+				second.Add(second, twin.Second.Amount)
 			}
 
 			m.log.Infof("executed %v twins for cost of %v wei", len(twins))
