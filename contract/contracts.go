@@ -1367,108 +1367,108 @@ func (_SimpleMarket *SimpleMarketTransactorSession) Offer(sell_how_much *big.Int
 	return _SimpleMarket.Contract.Offer(&_SimpleMarket.TransactOpts, sell_how_much, sell_which_token, buy_how_much, buy_which_token)
 }
 
-// TradeProxyABI is the input ABI used to generate the binding from.
-const TradeProxyABI = `[{"constant":false,"inputs":[{"name":"market","type":"address"},{"name":"firstId","type":"uint256"},{"name":"secondId","type":"uint256"}],"name":"trade","outputs":[],"type":"function"}]`
+// TraderKeeperABI is the input ABI used to generate the binding from.
+const TraderKeeperABI = `[{"constant":false,"inputs":[{"name":"token","type":"address"},{"name":"amount","type":"uint256"},{"name":"maker_address","type":"address"}],"name":"approve","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"token","type":"address"},{"name":"token_amount","type":"uint256"}],"name":"deposit","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"buy_how_much","type":"uint256"},{"name":"sell_how_much","type":"uint256"},{"name":"quantity","type":"uint256"},{"name":"token","type":"address"},{"name":"maker_address","type":"address"}],"name":"checkBalanceAndAllowance","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"bid_id","type":"uint256"},{"name":"ask_id","type":"uint256"},{"name":"buying","type":"address"},{"name":"selling","type":"address"},{"name":"maker_address","type":"address"}],"name":"trade","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"token","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"id","type":"uint256"},{"name":"maker_address","type":"address"}],"name":"getOffer","outputs":[{"name":"","type":"uint256"},{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"bid_buy_how_much","type":"uint256"},{"name":"bid_sell_how_much","type":"uint256"},{"name":"ask_buy_how_much","type":"uint256"},{"name":"ask_sell_how_much","type":"uint256"},{"name":"balance","type":"uint256"}],"name":"determineTradeQuantity","outputs":[{"name":"askQuantity","type":"uint256"},{"name":"bidQuantity","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"a","type":"uint256"},{"name":"b","type":"uint256"}],"name":"minimum","outputs":[{"name":"minimum","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"token","type":"address"},{"name":"token_amount","type":"uint256"}],"name":"withdraw","outputs":[],"type":"function"},{"inputs":[],"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"ask_quantity","type":"uint256"},{"indexed":false,"name":"buy_quantity","type":"uint256"}],"name":"TradeComplete","type":"event"}]`
 
-// TradeProxyBin is the compiled bytecode used for deploying new contracts.
-const TradeProxyBin = `0x6060604052610503806100126000396000f36060604052361561001f5760e060020a6000350463b44b96e18114610027575b610135610002565b61013560043560243560443560006000600060006000600060006000600060008c600160a060020a0316634579268a8d6040518260e060020a028152600401808281526020019150506080604051808303816000876161da5a03f115610002575050506040518051906020018051906020018051906020018051906020015099509950995099508c600160a060020a0316634579268a8c6040518260e060020a028152600401808281526020019150506080604051808303816000876161da5a03f1156100025750505060405180519060200180519060200180519060200180519060200150955095509550955082600160a060020a031689600160a060020a03161415156101e957610002565b005b82600160a060020a031663095ea7b38e866040518360e060020a0281526004018083600160a060020a03168152602001828152602001925050506020604051808303816000876161da5a03f1156100025750505060405180519060200150508c600160a060020a031663d96a094a8c6040518260e060020a028152600401808281526020019150506020604051808303816000876161da5a03f115610002575050505b50505050505050505050505050565b84600160a060020a031687600160a060020a031614151561020957610002565b86600160a060020a031663dd62ed3e33306040518360e060020a0281526004018083600160a060020a0316815260200182600160a060020a03168152602001925050506020604051808303816000876161da5a03f115610002575050604051519250508181141561027957610002565b818811156103355786600160a060020a031663095ea7b38e846040518360e060020a0281526004018083600160a060020a03168152602001828152602001925050506020604051808303816000876161da5a03f1156100025750505060405180519060200150508c600160a060020a031663a5d0bab18d8c8b8602046040518360e060020a02815260040180838152602001828152602001925050506020604051808303816000876161da5a03f11561000257506103d8915050565b86600160a060020a031663095ea7b38e8a6040518360e060020a0281526004018083600160a060020a03168152602001828152602001925050506020604051808303816000876161da5a03f1156100025750505060405180519060200150508c600160a060020a031663d96a094a8d6040518260e060020a028152600401808281526020019150506020604051808303816000876161da5a03f115610002575050505b82600160a060020a031663dd62ed3e33306040518360e060020a0281526004018083600160a060020a0316815260200182600160a060020a03168152602001925050506020604051808303816000876161da5a03f1156100025750506040515191821415905061044757610002565b808411156101375782600160a060020a031663095ea7b38e836040518360e060020a0281526004018083600160a060020a03168152602001828152602001925050506020604051808303816000876161da5a03f1156100025750505060405180519060200150508c600160a060020a031663a5d0bab18c88878502046040518360e060020a02815260040180838152602001828152602001925050506020604051808303816000876161da5a03f11561000257506101da91505056`
+// TraderKeeperBin is the compiled bytecode used for deploying new contracts.
+const TraderKeeperBin = `0x606060405260008054600160a060020a031916331790556106c6806100246000396000f3606060405236156100775760e060020a60003504631271f09a811461007957806347e7ef24146100de57806349e82b471461010b578063618bda511461013057806370a0823114610180578063b9520ce4146101df578063be9ecd0114610250578063dd2d2a1214610279578063f3fef3a314610294575b005b61007760043560243560443582600160a060020a031663095ea7b382846040518360e060020a0281526004018083600160a060020a03168152602001828152602001925050506020604051808303816000876161da5a03f11561000257505050505050565b6100776004356024356000546102e390600160a060020a0390811633909116145b8015156106c357610002565b6100776004356024356044356064356084355b84830284900460008061035985610187565b610077600435602435604435606435608435600060006000600060006000610431600060009054906101000a9004600160a060020a0316600160a060020a031633600160a060020a0316146100ff565b6102b86004355b600081600160a060020a03166370a08231306040518260e060020a0281526004018082600160a060020a031681526020019150506020604051808303816000876161da5a03f115610002575050604051519392505050565b6102ca6004356024355b60006000600060006000600086600160a060020a0316634579268a896040518260e060020a028152600401808281526020019150506080604051808303816000876161da5a03f115610002575050604080518051910151909a909950975050505050505050565b6102ca6004356024356044356064356084355b60006000600060006000600061062c8b89610283565b6102b86004356024355b60008183101561065957508161065c565b6100776004356024356000546106629033600160a060020a039081169116146100ff565b60408051918252519081900360200190f35b6040805192835260208301919091528051918290030190f35b61035582600160a060020a03166323b872dd3330856040518460e060020a0281526004018084600160a060020a0316815260200183600160a060020a0316815260200182815260200193505050506020604051808303816000876161da5a03f1156100025750506040515190506100ff565b5050565b9150610367838310156100ff565b84600160a060020a031663dd62ed3e30866040518360e060020a0281526004018083600160a060020a0316815260200182600160a060020a03168152602001925050506020604051808303816000876161da5a03f11561000257505060405151915050828110156104275784600160a060020a031663095ea7b385856040518360e060020a0281526004018083600160a060020a03168152602001828152602001925050506020604051808303816000876161da5a03f115610002575050505b5050505050505050565b61043b8b886101e9565b955095506104498a886101e9565b9350935061045d858785876104c88e610187565b9150915087600160a060020a031663095ea7b38886868602046040518360e060020a0281526004018083600160a060020a03168152602001828152602001925050506020604051808303816000876161da5a03f11561000257506104cd915084905085848b8b61011e565b610263565b61052587600160a060020a031663a5d0bab18c856040518360e060020a02815260040180838152602001828152602001925050506020604051808303816000876161da5a03f1156100025750506040515190506100ff565b88600160a060020a031663095ea7b38887898502046040518360e060020a0281526004018083600160a060020a03168152602001828152602001925050506020604051808303816000876161da5a03f115610002575061058c915086905087838c8b61011e565b6105e487600160a060020a031663a5d0bab18d846040518360e060020a02815260040180838152602001828152602001925050506020604051808303816000876161da5a03f1156100025750506040515190506100ff565b604080518381526020810183905281517fc1c50e2526e5f7ae5b089999527fb34ec06b2f9f74f1c76c9ad728e81098c8e4929181900390910190a15050505050505050505050565b93508789850204925061063f8784610283565b939093029190910499978a02989098049750505050505050565b50805b92915050565b61035582600160a060020a031663a9059cbb33846040518360e060020a0281526004018083600160a060020a03168152602001828152602001925050506020604051808303816000876161da5a03f1156100025750506040515190506100ff565b5056`
 
-// DeployTradeProxy deploys a new Ethereum contract, binding an instance of TradeProxy to it.
-func DeployTradeProxy(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *TradeProxy, error) {
-	parsed, err := abi.JSON(strings.NewReader(TradeProxyABI))
+// DeployTraderKeeper deploys a new Ethereum contract, binding an instance of TraderKeeper to it.
+func DeployTraderKeeper(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *TraderKeeper, error) {
+	parsed, err := abi.JSON(strings.NewReader(TraderKeeperABI))
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}
-	address, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(TradeProxyBin), backend)
+	address, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(TraderKeeperBin), backend)
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}
-	return address, tx, &TradeProxy{TradeProxyCaller: TradeProxyCaller{contract: contract}, TradeProxyTransactor: TradeProxyTransactor{contract: contract}}, nil
+	return address, tx, &TraderKeeper{TraderKeeperCaller: TraderKeeperCaller{contract: contract}, TraderKeeperTransactor: TraderKeeperTransactor{contract: contract}}, nil
 }
 
-// TradeProxy is an auto generated Go binding around an Ethereum contract.
-type TradeProxy struct {
-	TradeProxyCaller     // Read-only binding to the contract
-	TradeProxyTransactor // Write-only binding to the contract
+// TraderKeeper is an auto generated Go binding around an Ethereum contract.
+type TraderKeeper struct {
+	TraderKeeperCaller     // Read-only binding to the contract
+	TraderKeeperTransactor // Write-only binding to the contract
 }
 
-// TradeProxyCaller is an auto generated read-only Go binding around an Ethereum contract.
-type TradeProxyCaller struct {
+// TraderKeeperCaller is an auto generated read-only Go binding around an Ethereum contract.
+type TraderKeeperCaller struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-// TradeProxyTransactor is an auto generated write-only Go binding around an Ethereum contract.
-type TradeProxyTransactor struct {
+// TraderKeeperTransactor is an auto generated write-only Go binding around an Ethereum contract.
+type TraderKeeperTransactor struct {
 	contract *bind.BoundContract // Generic contract wrapper for the low level calls
 }
 
-// TradeProxySession is an auto generated Go binding around an Ethereum contract,
+// TraderKeeperSession is an auto generated Go binding around an Ethereum contract,
 // with pre-set call and transact options.
-type TradeProxySession struct {
-	Contract     *TradeProxy       // Generic contract binding to set the session for
+type TraderKeeperSession struct {
+	Contract     *TraderKeeper     // Generic contract binding to set the session for
 	CallOpts     bind.CallOpts     // Call options to use throughout this session
 	TransactOpts bind.TransactOpts // Transaction auth options to use throughout this session
 }
 
-// TradeProxyCallerSession is an auto generated read-only Go binding around an Ethereum contract,
+// TraderKeeperCallerSession is an auto generated read-only Go binding around an Ethereum contract,
 // with pre-set call options.
-type TradeProxyCallerSession struct {
-	Contract *TradeProxyCaller // Generic contract caller binding to set the session for
-	CallOpts bind.CallOpts     // Call options to use throughout this session
+type TraderKeeperCallerSession struct {
+	Contract *TraderKeeperCaller // Generic contract caller binding to set the session for
+	CallOpts bind.CallOpts       // Call options to use throughout this session
 }
 
-// TradeProxyTransactorSession is an auto generated write-only Go binding around an Ethereum contract,
+// TraderKeeperTransactorSession is an auto generated write-only Go binding around an Ethereum contract,
 // with pre-set transact options.
-type TradeProxyTransactorSession struct {
-	Contract     *TradeProxyTransactor // Generic contract transactor binding to set the session for
-	TransactOpts bind.TransactOpts     // Transaction auth options to use throughout this session
+type TraderKeeperTransactorSession struct {
+	Contract     *TraderKeeperTransactor // Generic contract transactor binding to set the session for
+	TransactOpts bind.TransactOpts       // Transaction auth options to use throughout this session
 }
 
-// TradeProxyRaw is an auto generated low-level Go binding around an Ethereum contract.
-type TradeProxyRaw struct {
-	Contract *TradeProxy // Generic contract binding to access the raw methods on
+// TraderKeeperRaw is an auto generated low-level Go binding around an Ethereum contract.
+type TraderKeeperRaw struct {
+	Contract *TraderKeeper // Generic contract binding to access the raw methods on
 }
 
-// TradeProxyCallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
-type TradeProxyCallerRaw struct {
-	Contract *TradeProxyCaller // Generic read-only contract binding to access the raw methods on
+// TraderKeeperCallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
+type TraderKeeperCallerRaw struct {
+	Contract *TraderKeeperCaller // Generic read-only contract binding to access the raw methods on
 }
 
-// TradeProxyTransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
-type TradeProxyTransactorRaw struct {
-	Contract *TradeProxyTransactor // Generic write-only contract binding to access the raw methods on
+// TraderKeeperTransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
+type TraderKeeperTransactorRaw struct {
+	Contract *TraderKeeperTransactor // Generic write-only contract binding to access the raw methods on
 }
 
-// NewTradeProxy creates a new instance of TradeProxy, bound to a specific deployed contract.
-func NewTradeProxy(address common.Address, backend bind.ContractBackend) (*TradeProxy, error) {
-	contract, err := bindTradeProxy(address, backend.(bind.ContractCaller), backend.(bind.ContractTransactor))
+// NewTraderKeeper creates a new instance of TraderKeeper, bound to a specific deployed contract.
+func NewTraderKeeper(address common.Address, backend bind.ContractBackend) (*TraderKeeper, error) {
+	contract, err := bindTraderKeeper(address, backend.(bind.ContractCaller), backend.(bind.ContractTransactor))
 	if err != nil {
 		return nil, err
 	}
-	return &TradeProxy{TradeProxyCaller: TradeProxyCaller{contract: contract}, TradeProxyTransactor: TradeProxyTransactor{contract: contract}}, nil
+	return &TraderKeeper{TraderKeeperCaller: TraderKeeperCaller{contract: contract}, TraderKeeperTransactor: TraderKeeperTransactor{contract: contract}}, nil
 }
 
-// NewTradeProxyCaller creates a new read-only instance of TradeProxy, bound to a specific deployed contract.
-func NewTradeProxyCaller(address common.Address, caller bind.ContractCaller) (*TradeProxyCaller, error) {
-	contract, err := bindTradeProxy(address, caller, nil)
+// NewTraderKeeperCaller creates a new read-only instance of TraderKeeper, bound to a specific deployed contract.
+func NewTraderKeeperCaller(address common.Address, caller bind.ContractCaller) (*TraderKeeperCaller, error) {
+	contract, err := bindTraderKeeper(address, caller, nil)
 	if err != nil {
 		return nil, err
 	}
-	return &TradeProxyCaller{contract: contract}, nil
+	return &TraderKeeperCaller{contract: contract}, nil
 }
 
-// NewTradeProxyTransactor creates a new write-only instance of TradeProxy, bound to a specific deployed contract.
-func NewTradeProxyTransactor(address common.Address, transactor bind.ContractTransactor) (*TradeProxyTransactor, error) {
-	contract, err := bindTradeProxy(address, nil, transactor)
+// NewTraderKeeperTransactor creates a new write-only instance of TraderKeeper, bound to a specific deployed contract.
+func NewTraderKeeperTransactor(address common.Address, transactor bind.ContractTransactor) (*TraderKeeperTransactor, error) {
+	contract, err := bindTraderKeeper(address, nil, transactor)
 	if err != nil {
 		return nil, err
 	}
-	return &TradeProxyTransactor{contract: contract}, nil
+	return &TraderKeeperTransactor{contract: contract}, nil
 }
 
-// bindTradeProxy binds a generic wrapper to an already deployed contract.
-func bindTradeProxy(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor) (*bind.BoundContract, error) {
-	parsed, err := abi.JSON(strings.NewReader(TradeProxyABI))
+// bindTraderKeeper binds a generic wrapper to an already deployed contract.
+func bindTraderKeeper(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor) (*bind.BoundContract, error) {
+	parsed, err := abi.JSON(strings.NewReader(TraderKeeperABI))
 	if err != nil {
 		return nil, err
 	}
@@ -1479,57 +1479,601 @@ func bindTradeProxy(address common.Address, caller bind.ContractCaller, transact
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_TradeProxy *TradeProxyRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _TradeProxy.Contract.TradeProxyCaller.contract.Call(opts, result, method, params...)
+func (_TraderKeeper *TraderKeeperRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+	return _TraderKeeper.Contract.TraderKeeperCaller.contract.Call(opts, result, method, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
 // its default method if one is available.
-func (_TradeProxy *TradeProxyRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _TradeProxy.Contract.TradeProxyTransactor.contract.Transfer(opts)
+func (_TraderKeeper *TraderKeeperRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.TraderKeeperTransactor.contract.Transfer(opts)
 }
 
 // Transact invokes the (paid) contract method with params as input values.
-func (_TradeProxy *TradeProxyRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
-	return _TradeProxy.Contract.TradeProxyTransactor.contract.Transact(opts, method, params...)
+func (_TraderKeeper *TraderKeeperRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.TraderKeeperTransactor.contract.Transact(opts, method, params...)
 }
 
 // Call invokes the (constant) contract method with params as input values and
 // sets the output to result. The result type might be a single field for simple
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
-func (_TradeProxy *TradeProxyCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _TradeProxy.Contract.contract.Call(opts, result, method, params...)
+func (_TraderKeeper *TraderKeeperCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+	return _TraderKeeper.Contract.contract.Call(opts, result, method, params...)
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
 // its default method if one is available.
-func (_TradeProxy *TradeProxyTransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
-	return _TradeProxy.Contract.contract.Transfer(opts)
+func (_TraderKeeper *TraderKeeperTransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.contract.Transfer(opts)
 }
 
 // Transact invokes the (paid) contract method with params as input values.
-func (_TradeProxy *TradeProxyTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
-	return _TradeProxy.Contract.contract.Transact(opts, method, params...)
+func (_TraderKeeper *TraderKeeperTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.contract.Transact(opts, method, params...)
 }
 
-// Trade is a paid mutator transaction binding the contract method 0xb44b96e1.
+// BalanceOf is a free data retrieval call binding the contract method 0x70a08231.
 //
-// Solidity: function trade(market address, firstId uint256, secondId uint256) returns()
-func (_TradeProxy *TradeProxyTransactor) Trade(opts *bind.TransactOpts, market common.Address, firstId *big.Int, secondId *big.Int) (*types.Transaction, error) {
-	return _TradeProxy.contract.Transact(opts, "trade", market, firstId, secondId)
+// Solidity: function balanceOf(token address) constant returns(uint256)
+func (_TraderKeeper *TraderKeeperCaller) BalanceOf(opts *bind.CallOpts, token common.Address) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _TraderKeeper.contract.Call(opts, out, "balanceOf", token)
+	return *ret0, err
 }
 
-// Trade is a paid mutator transaction binding the contract method 0xb44b96e1.
+// BalanceOf is a free data retrieval call binding the contract method 0x70a08231.
 //
-// Solidity: function trade(market address, firstId uint256, secondId uint256) returns()
-func (_TradeProxy *TradeProxySession) Trade(market common.Address, firstId *big.Int, secondId *big.Int) (*types.Transaction, error) {
-	return _TradeProxy.Contract.Trade(&_TradeProxy.TransactOpts, market, firstId, secondId)
+// Solidity: function balanceOf(token address) constant returns(uint256)
+func (_TraderKeeper *TraderKeeperSession) BalanceOf(token common.Address) (*big.Int, error) {
+	return _TraderKeeper.Contract.BalanceOf(&_TraderKeeper.CallOpts, token)
 }
 
-// Trade is a paid mutator transaction binding the contract method 0xb44b96e1.
+// BalanceOf is a free data retrieval call binding the contract method 0x70a08231.
 //
-// Solidity: function trade(market address, firstId uint256, secondId uint256) returns()
-func (_TradeProxy *TradeProxyTransactorSession) Trade(market common.Address, firstId *big.Int, secondId *big.Int) (*types.Transaction, error) {
-	return _TradeProxy.Contract.Trade(&_TradeProxy.TransactOpts, market, firstId, secondId)
+// Solidity: function balanceOf(token address) constant returns(uint256)
+func (_TraderKeeper *TraderKeeperCallerSession) BalanceOf(token common.Address) (*big.Int, error) {
+	return _TraderKeeper.Contract.BalanceOf(&_TraderKeeper.CallOpts, token)
+}
+
+// DetermineTradeQuantity is a free data retrieval call binding the contract method 0xbe9ecd01.
+//
+// Solidity: function determineTradeQuantity(bid_buy_how_much uint256, bid_sell_how_much uint256, ask_buy_how_much uint256, ask_sell_how_much uint256, balance uint256) constant returns(askQuantity uint256, bidQuantity uint256)
+func (_TraderKeeper *TraderKeeperCaller) DetermineTradeQuantity(opts *bind.CallOpts, bid_buy_how_much *big.Int, bid_sell_how_much *big.Int, ask_buy_how_much *big.Int, ask_sell_how_much *big.Int, balance *big.Int) (struct {
+	AskQuantity *big.Int
+	BidQuantity *big.Int
+}, error) {
+	ret := new(struct {
+		AskQuantity *big.Int
+		BidQuantity *big.Int
+	})
+	out := ret
+	err := _TraderKeeper.contract.Call(opts, out, "determineTradeQuantity", bid_buy_how_much, bid_sell_how_much, ask_buy_how_much, ask_sell_how_much, balance)
+	return *ret, err
+}
+
+// DetermineTradeQuantity is a free data retrieval call binding the contract method 0xbe9ecd01.
+//
+// Solidity: function determineTradeQuantity(bid_buy_how_much uint256, bid_sell_how_much uint256, ask_buy_how_much uint256, ask_sell_how_much uint256, balance uint256) constant returns(askQuantity uint256, bidQuantity uint256)
+func (_TraderKeeper *TraderKeeperSession) DetermineTradeQuantity(bid_buy_how_much *big.Int, bid_sell_how_much *big.Int, ask_buy_how_much *big.Int, ask_sell_how_much *big.Int, balance *big.Int) (struct {
+	AskQuantity *big.Int
+	BidQuantity *big.Int
+}, error) {
+	return _TraderKeeper.Contract.DetermineTradeQuantity(&_TraderKeeper.CallOpts, bid_buy_how_much, bid_sell_how_much, ask_buy_how_much, ask_sell_how_much, balance)
+}
+
+// DetermineTradeQuantity is a free data retrieval call binding the contract method 0xbe9ecd01.
+//
+// Solidity: function determineTradeQuantity(bid_buy_how_much uint256, bid_sell_how_much uint256, ask_buy_how_much uint256, ask_sell_how_much uint256, balance uint256) constant returns(askQuantity uint256, bidQuantity uint256)
+func (_TraderKeeper *TraderKeeperCallerSession) DetermineTradeQuantity(bid_buy_how_much *big.Int, bid_sell_how_much *big.Int, ask_buy_how_much *big.Int, ask_sell_how_much *big.Int, balance *big.Int) (struct {
+	AskQuantity *big.Int
+	BidQuantity *big.Int
+}, error) {
+	return _TraderKeeper.Contract.DetermineTradeQuantity(&_TraderKeeper.CallOpts, bid_buy_how_much, bid_sell_how_much, ask_buy_how_much, ask_sell_how_much, balance)
+}
+
+// GetOffer is a free data retrieval call binding the contract method 0xb9520ce4.
+//
+// Solidity: function getOffer(id uint256, maker_address address) constant returns(uint256, uint256)
+func (_TraderKeeper *TraderKeeperCaller) GetOffer(opts *bind.CallOpts, id *big.Int, maker_address common.Address) (*big.Int, *big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+		ret1 = new(*big.Int)
+	)
+	out := &[]interface{}{
+		ret0,
+		ret1,
+	}
+	err := _TraderKeeper.contract.Call(opts, out, "getOffer", id, maker_address)
+	return *ret0, *ret1, err
+}
+
+// GetOffer is a free data retrieval call binding the contract method 0xb9520ce4.
+//
+// Solidity: function getOffer(id uint256, maker_address address) constant returns(uint256, uint256)
+func (_TraderKeeper *TraderKeeperSession) GetOffer(id *big.Int, maker_address common.Address) (*big.Int, *big.Int, error) {
+	return _TraderKeeper.Contract.GetOffer(&_TraderKeeper.CallOpts, id, maker_address)
+}
+
+// GetOffer is a free data retrieval call binding the contract method 0xb9520ce4.
+//
+// Solidity: function getOffer(id uint256, maker_address address) constant returns(uint256, uint256)
+func (_TraderKeeper *TraderKeeperCallerSession) GetOffer(id *big.Int, maker_address common.Address) (*big.Int, *big.Int, error) {
+	return _TraderKeeper.Contract.GetOffer(&_TraderKeeper.CallOpts, id, maker_address)
+}
+
+// Minimum is a free data retrieval call binding the contract method 0xdd2d2a12.
+//
+// Solidity: function minimum(a uint256, b uint256) constant returns(minimum uint256)
+func (_TraderKeeper *TraderKeeperCaller) Minimum(opts *bind.CallOpts, a *big.Int, b *big.Int) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _TraderKeeper.contract.Call(opts, out, "minimum", a, b)
+	return *ret0, err
+}
+
+// Minimum is a free data retrieval call binding the contract method 0xdd2d2a12.
+//
+// Solidity: function minimum(a uint256, b uint256) constant returns(minimum uint256)
+func (_TraderKeeper *TraderKeeperSession) Minimum(a *big.Int, b *big.Int) (*big.Int, error) {
+	return _TraderKeeper.Contract.Minimum(&_TraderKeeper.CallOpts, a, b)
+}
+
+// Minimum is a free data retrieval call binding the contract method 0xdd2d2a12.
+//
+// Solidity: function minimum(a uint256, b uint256) constant returns(minimum uint256)
+func (_TraderKeeper *TraderKeeperCallerSession) Minimum(a *big.Int, b *big.Int) (*big.Int, error) {
+	return _TraderKeeper.Contract.Minimum(&_TraderKeeper.CallOpts, a, b)
+}
+
+// Approve is a paid mutator transaction binding the contract method 0x1271f09a.
+//
+// Solidity: function approve(token address, amount uint256, maker_address address) returns()
+func (_TraderKeeper *TraderKeeperTransactor) Approve(opts *bind.TransactOpts, token common.Address, amount *big.Int, maker_address common.Address) (*types.Transaction, error) {
+	return _TraderKeeper.contract.Transact(opts, "approve", token, amount, maker_address)
+}
+
+// Approve is a paid mutator transaction binding the contract method 0x1271f09a.
+//
+// Solidity: function approve(token address, amount uint256, maker_address address) returns()
+func (_TraderKeeper *TraderKeeperSession) Approve(token common.Address, amount *big.Int, maker_address common.Address) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.Approve(&_TraderKeeper.TransactOpts, token, amount, maker_address)
+}
+
+// Approve is a paid mutator transaction binding the contract method 0x1271f09a.
+//
+// Solidity: function approve(token address, amount uint256, maker_address address) returns()
+func (_TraderKeeper *TraderKeeperTransactorSession) Approve(token common.Address, amount *big.Int, maker_address common.Address) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.Approve(&_TraderKeeper.TransactOpts, token, amount, maker_address)
+}
+
+// CheckBalanceAndAllowance is a paid mutator transaction binding the contract method 0x49e82b47.
+//
+// Solidity: function checkBalanceAndAllowance(buy_how_much uint256, sell_how_much uint256, quantity uint256, token address, maker_address address) returns()
+func (_TraderKeeper *TraderKeeperTransactor) CheckBalanceAndAllowance(opts *bind.TransactOpts, buy_how_much *big.Int, sell_how_much *big.Int, quantity *big.Int, token common.Address, maker_address common.Address) (*types.Transaction, error) {
+	return _TraderKeeper.contract.Transact(opts, "checkBalanceAndAllowance", buy_how_much, sell_how_much, quantity, token, maker_address)
+}
+
+// CheckBalanceAndAllowance is a paid mutator transaction binding the contract method 0x49e82b47.
+//
+// Solidity: function checkBalanceAndAllowance(buy_how_much uint256, sell_how_much uint256, quantity uint256, token address, maker_address address) returns()
+func (_TraderKeeper *TraderKeeperSession) CheckBalanceAndAllowance(buy_how_much *big.Int, sell_how_much *big.Int, quantity *big.Int, token common.Address, maker_address common.Address) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.CheckBalanceAndAllowance(&_TraderKeeper.TransactOpts, buy_how_much, sell_how_much, quantity, token, maker_address)
+}
+
+// CheckBalanceAndAllowance is a paid mutator transaction binding the contract method 0x49e82b47.
+//
+// Solidity: function checkBalanceAndAllowance(buy_how_much uint256, sell_how_much uint256, quantity uint256, token address, maker_address address) returns()
+func (_TraderKeeper *TraderKeeperTransactorSession) CheckBalanceAndAllowance(buy_how_much *big.Int, sell_how_much *big.Int, quantity *big.Int, token common.Address, maker_address common.Address) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.CheckBalanceAndAllowance(&_TraderKeeper.TransactOpts, buy_how_much, sell_how_much, quantity, token, maker_address)
+}
+
+// Deposit is a paid mutator transaction binding the contract method 0x47e7ef24.
+//
+// Solidity: function deposit(token address, token_amount uint256) returns()
+func (_TraderKeeper *TraderKeeperTransactor) Deposit(opts *bind.TransactOpts, token common.Address, token_amount *big.Int) (*types.Transaction, error) {
+	return _TraderKeeper.contract.Transact(opts, "deposit", token, token_amount)
+}
+
+// Deposit is a paid mutator transaction binding the contract method 0x47e7ef24.
+//
+// Solidity: function deposit(token address, token_amount uint256) returns()
+func (_TraderKeeper *TraderKeeperSession) Deposit(token common.Address, token_amount *big.Int) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.Deposit(&_TraderKeeper.TransactOpts, token, token_amount)
+}
+
+// Deposit is a paid mutator transaction binding the contract method 0x47e7ef24.
+//
+// Solidity: function deposit(token address, token_amount uint256) returns()
+func (_TraderKeeper *TraderKeeperTransactorSession) Deposit(token common.Address, token_amount *big.Int) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.Deposit(&_TraderKeeper.TransactOpts, token, token_amount)
+}
+
+// Trade is a paid mutator transaction binding the contract method 0x618bda51.
+//
+// Solidity: function trade(bid_id uint256, ask_id uint256, buying address, selling address, maker_address address) returns()
+func (_TraderKeeper *TraderKeeperTransactor) Trade(opts *bind.TransactOpts, bid_id *big.Int, ask_id *big.Int, buying common.Address, selling common.Address, maker_address common.Address) (*types.Transaction, error) {
+	return _TraderKeeper.contract.Transact(opts, "trade", bid_id, ask_id, buying, selling, maker_address)
+}
+
+// Trade is a paid mutator transaction binding the contract method 0x618bda51.
+//
+// Solidity: function trade(bid_id uint256, ask_id uint256, buying address, selling address, maker_address address) returns()
+func (_TraderKeeper *TraderKeeperSession) Trade(bid_id *big.Int, ask_id *big.Int, buying common.Address, selling common.Address, maker_address common.Address) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.Trade(&_TraderKeeper.TransactOpts, bid_id, ask_id, buying, selling, maker_address)
+}
+
+// Trade is a paid mutator transaction binding the contract method 0x618bda51.
+//
+// Solidity: function trade(bid_id uint256, ask_id uint256, buying address, selling address, maker_address address) returns()
+func (_TraderKeeper *TraderKeeperTransactorSession) Trade(bid_id *big.Int, ask_id *big.Int, buying common.Address, selling common.Address, maker_address common.Address) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.Trade(&_TraderKeeper.TransactOpts, bid_id, ask_id, buying, selling, maker_address)
+}
+
+// Withdraw is a paid mutator transaction binding the contract method 0xf3fef3a3.
+//
+// Solidity: function withdraw(token address, token_amount uint256) returns()
+func (_TraderKeeper *TraderKeeperTransactor) Withdraw(opts *bind.TransactOpts, token common.Address, token_amount *big.Int) (*types.Transaction, error) {
+	return _TraderKeeper.contract.Transact(opts, "withdraw", token, token_amount)
+}
+
+// Withdraw is a paid mutator transaction binding the contract method 0xf3fef3a3.
+//
+// Solidity: function withdraw(token address, token_amount uint256) returns()
+func (_TraderKeeper *TraderKeeperSession) Withdraw(token common.Address, token_amount *big.Int) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.Withdraw(&_TraderKeeper.TransactOpts, token, token_amount)
+}
+
+// Withdraw is a paid mutator transaction binding the contract method 0xf3fef3a3.
+//
+// Solidity: function withdraw(token address, token_amount uint256) returns()
+func (_TraderKeeper *TraderKeeperTransactorSession) Withdraw(token common.Address, token_amount *big.Int) (*types.Transaction, error) {
+	return _TraderKeeper.Contract.Withdraw(&_TraderKeeper.TransactOpts, token, token_amount)
+}
+
+// TraderKeeperMarketABI is the input ABI used to generate the binding from.
+const TraderKeeperMarketABI = `[{"constant":true,"inputs":[],"name":"last_offer_id","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"id","type":"uint256"}],"name":"cancel","outputs":[{"name":"_success","type":"bool"}],"type":"function"},{"constant":true,"inputs":[{"name":"id","type":"uint256"}],"name":"getOffer","outputs":[{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"},{"name":"","type":"address"}],"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"offers","outputs":[{"name":"sell_how_much","type":"uint256"},{"name":"sell_which_token","type":"address"},{"name":"buy_how_much","type":"uint256"},{"name":"buy_which_token","type":"address"},{"name":"owner","type":"address"},{"name":"active","type":"bool"}],"type":"function"},{"constant":false,"inputs":[{"name":"id","type":"uint256"},{"name":"quantity","type":"uint256"}],"name":"buyPartial","outputs":[{"name":"_success","type":"bool"}],"type":"function"},{"constant":false,"inputs":[{"name":"id","type":"uint256"}],"name":"buy","outputs":[{"name":"_success","type":"bool"}],"type":"function"},{"constant":false,"inputs":[{"name":"sell_how_much","type":"uint256"},{"name":"sell_which_token","type":"address"},{"name":"buy_how_much","type":"uint256"},{"name":"buy_which_token","type":"address"}],"name":"offer","outputs":[{"name":"id","type":"uint256"}],"type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"id","type":"uint256"}],"name":"ItemUpdate","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"sell_how_much","type":"uint256"},{"indexed":true,"name":"sell_which_token","type":"address"},{"indexed":false,"name":"buy_how_much","type":"uint256"},{"indexed":true,"name":"buy_which_token","type":"address"}],"name":"Trade","type":"event"}]`
+
+// TraderKeeperMarketBin is the compiled bytecode used for deploying new contracts.
+const TraderKeeperMarketBin = `0x60606040526108a2806100126000396000f3606060405236156100615760e060020a6000350463232cae0b811461006957806340e58ee5146100725780634579268a146100a85780638a72ea6a146100ff578063a5d0bab114610150578063d96a094a14610181578063f09ea2a6146101ad575b610203610002565b61020560005481565b61021760043560008181526001602052604081206004810154829061026c9060a060020a900460ff165b8015156107be57610002565b6004356000908152600160208181526040805193819020805460028201549482015460039290920154908652600160a060020a03918216938601939093528482019390935291166060830152519081900360800190f35b61022b600435600160208190526000918252604090912080546002820154600483015493830154600393909301549193600160a060020a0393841693919282169181169060a060020a900460ff1686565b6102176004356024356000828152600160205260408120600481015482906103879060a060020a900460ff1661009c565b610217600435600081815260016020526040812060048101546104c09060a060020a900460ff1661009c565b6102056004356024356044356064356000600060c0604051908101604052806000815260200160008152602001600081526020016000815260200160008152602001600081526020015061061d6000881161009c565b005b60408051918252519081900360200190f35b604080519115158252519081900360200190f35b60408051968752600160a060020a039586166020880152868101949094529184166060860152909216608084015290151560a0830152519081900360c00190f35b600482015461028a90600160a060020a03908116339091161461009c565b60408051835460018501547fa9059cbb00000000000000000000000000000000000000000000000000000000835233600160a060020a0390811660048501526024840192909252925192169163a9059cbb9160448181019260209290919082900301816000876161da5a03f11561000257505060405151915061030e90508161009c565b60008481526001602081815260408084208481559283018054600160a060020a031990811690915560028401949094556003830180549094169093556004919091018054600160a860020a0319169055815186815291516000805160206108828339815191529281900390910190a15060019392505050565b600085815260016020526040902054849010156103a757600092506104b8565b6000858152600160205260409020548414156103f2576004820154600183015460038401548454600286015461044494600160a060020a0390811694929392811692339291166104f0565b506000848152600160205260408120805460029190910154850204908111156104b85760048201546001830154600384015461056992600160a060020a039081169288929082169133918791166104f0565b60008581526001602081815260408084208481559283018054600160a060020a031990811690915560028401949094556003830180549094169093556004919091018054600160a860020a0319169055815187815291516000805160206108828339815191529281900390910190a1600192505b505092915050565b600481015481546001830154600284015460038501546105a594600160a060020a03908116949381169233929091165b6000600082600160a060020a03166323b872dd868a876040518460e060020a0281526004018084600160a060020a0316815260200183600160a060020a0316815260200182815260200193505050506020604051808303816000876161da5a03f1156100025750506040515192506107c190508261009c565b8154849003825560028201805482900390556040805186815290516000805160206108828339815191529181900360200190a1600192506104b8565b60008381526001602081815260408084208481559283018054600160a060020a031990811690915560028401949094556003830180549094169093556004919091018054600160a860020a0319169055815185815291516000805160206108828339815191529281900390910190a150600192915050565b610633600160a060020a0387166000141561009c565b61063f6000861161009c565b610655600160a060020a0385166000141561009c565b85600160a060020a03166323b872dd33308a6040518460e060020a0281526004018084600160a060020a0316815260200183600160a060020a0316815260200182815260200193505050506020604051808303816000876161da5a03f1156100025750506040515192506106ca90508261009c565b868152600160a060020a03868116602083015260408201869052848116606083015233166080820152600160a082015261070b600080546001019081905590565b60008181526001602081815260409283902085518155918201805486830151600160a060020a03199182161790915585840151600284015560038301805460608801519083161790556004929092018054608087015160a088015160a060020a02919094169390931774ff00000000000000000000000000000000000000001916929092179091558151838152915192955060008051602061088283398151915292918290030190a15050949350505050565b50565b85600160a060020a031663a9059cbb86896040518360e060020a0281526004018083600160a060020a03168152602001828152602001925050506020604051808303816000876161da5a03f11561000257505060405151915061082590508161009c565b82600160a060020a031686600160a060020a03167fa5ca35f5c7b1c108bbc4c25279f619f720805890f993005d9f00ef1e32663f9b8987604051808381526020018281526020019250505060405180910390a3505050505050505056de857d2761836ca6234345c7f7f4c783271ed7d1aedf9268b3fe32800d186fde`
+
+// DeployTraderKeeperMarket deploys a new Ethereum contract, binding an instance of TraderKeeperMarket to it.
+func DeployTraderKeeperMarket(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *TraderKeeperMarket, error) {
+	parsed, err := abi.JSON(strings.NewReader(TraderKeeperMarketABI))
+	if err != nil {
+		return common.Address{}, nil, nil, err
+	}
+	address, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(TraderKeeperMarketBin), backend)
+	if err != nil {
+		return common.Address{}, nil, nil, err
+	}
+	return address, tx, &TraderKeeperMarket{TraderKeeperMarketCaller: TraderKeeperMarketCaller{contract: contract}, TraderKeeperMarketTransactor: TraderKeeperMarketTransactor{contract: contract}}, nil
+}
+
+// TraderKeeperMarket is an auto generated Go binding around an Ethereum contract.
+type TraderKeeperMarket struct {
+	TraderKeeperMarketCaller     // Read-only binding to the contract
+	TraderKeeperMarketTransactor // Write-only binding to the contract
+}
+
+// TraderKeeperMarketCaller is an auto generated read-only Go binding around an Ethereum contract.
+type TraderKeeperMarketCaller struct {
+	contract *bind.BoundContract // Generic contract wrapper for the low level calls
+}
+
+// TraderKeeperMarketTransactor is an auto generated write-only Go binding around an Ethereum contract.
+type TraderKeeperMarketTransactor struct {
+	contract *bind.BoundContract // Generic contract wrapper for the low level calls
+}
+
+// TraderKeeperMarketSession is an auto generated Go binding around an Ethereum contract,
+// with pre-set call and transact options.
+type TraderKeeperMarketSession struct {
+	Contract     *TraderKeeperMarket // Generic contract binding to set the session for
+	CallOpts     bind.CallOpts       // Call options to use throughout this session
+	TransactOpts bind.TransactOpts   // Transaction auth options to use throughout this session
+}
+
+// TraderKeeperMarketCallerSession is an auto generated read-only Go binding around an Ethereum contract,
+// with pre-set call options.
+type TraderKeeperMarketCallerSession struct {
+	Contract *TraderKeeperMarketCaller // Generic contract caller binding to set the session for
+	CallOpts bind.CallOpts             // Call options to use throughout this session
+}
+
+// TraderKeeperMarketTransactorSession is an auto generated write-only Go binding around an Ethereum contract,
+// with pre-set transact options.
+type TraderKeeperMarketTransactorSession struct {
+	Contract     *TraderKeeperMarketTransactor // Generic contract transactor binding to set the session for
+	TransactOpts bind.TransactOpts             // Transaction auth options to use throughout this session
+}
+
+// TraderKeeperMarketRaw is an auto generated low-level Go binding around an Ethereum contract.
+type TraderKeeperMarketRaw struct {
+	Contract *TraderKeeperMarket // Generic contract binding to access the raw methods on
+}
+
+// TraderKeeperMarketCallerRaw is an auto generated low-level read-only Go binding around an Ethereum contract.
+type TraderKeeperMarketCallerRaw struct {
+	Contract *TraderKeeperMarketCaller // Generic read-only contract binding to access the raw methods on
+}
+
+// TraderKeeperMarketTransactorRaw is an auto generated low-level write-only Go binding around an Ethereum contract.
+type TraderKeeperMarketTransactorRaw struct {
+	Contract *TraderKeeperMarketTransactor // Generic write-only contract binding to access the raw methods on
+}
+
+// NewTraderKeeperMarket creates a new instance of TraderKeeperMarket, bound to a specific deployed contract.
+func NewTraderKeeperMarket(address common.Address, backend bind.ContractBackend) (*TraderKeeperMarket, error) {
+	contract, err := bindTraderKeeperMarket(address, backend.(bind.ContractCaller), backend.(bind.ContractTransactor))
+	if err != nil {
+		return nil, err
+	}
+	return &TraderKeeperMarket{TraderKeeperMarketCaller: TraderKeeperMarketCaller{contract: contract}, TraderKeeperMarketTransactor: TraderKeeperMarketTransactor{contract: contract}}, nil
+}
+
+// NewTraderKeeperMarketCaller creates a new read-only instance of TraderKeeperMarket, bound to a specific deployed contract.
+func NewTraderKeeperMarketCaller(address common.Address, caller bind.ContractCaller) (*TraderKeeperMarketCaller, error) {
+	contract, err := bindTraderKeeperMarket(address, caller, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &TraderKeeperMarketCaller{contract: contract}, nil
+}
+
+// NewTraderKeeperMarketTransactor creates a new write-only instance of TraderKeeperMarket, bound to a specific deployed contract.
+func NewTraderKeeperMarketTransactor(address common.Address, transactor bind.ContractTransactor) (*TraderKeeperMarketTransactor, error) {
+	contract, err := bindTraderKeeperMarket(address, nil, transactor)
+	if err != nil {
+		return nil, err
+	}
+	return &TraderKeeperMarketTransactor{contract: contract}, nil
+}
+
+// bindTraderKeeperMarket binds a generic wrapper to an already deployed contract.
+func bindTraderKeeperMarket(address common.Address, caller bind.ContractCaller, transactor bind.ContractTransactor) (*bind.BoundContract, error) {
+	parsed, err := abi.JSON(strings.NewReader(TraderKeeperMarketABI))
+	if err != nil {
+		return nil, err
+	}
+	return bind.NewBoundContract(address, parsed, caller, transactor), nil
+}
+
+// Call invokes the (constant) contract method with params as input values and
+// sets the output to result. The result type might be a single field for simple
+// returns, a slice of interfaces for anonymous returns and a struct for named
+// returns.
+func (_TraderKeeperMarket *TraderKeeperMarketRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+	return _TraderKeeperMarket.Contract.TraderKeeperMarketCaller.contract.Call(opts, result, method, params...)
+}
+
+// Transfer initiates a plain transaction to move funds to the contract, calling
+// its default method if one is available.
+func (_TraderKeeperMarket *TraderKeeperMarketRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _TraderKeeperMarket.Contract.TraderKeeperMarketTransactor.contract.Transfer(opts)
+}
+
+// Transact invokes the (paid) contract method with params as input values.
+func (_TraderKeeperMarket *TraderKeeperMarketRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _TraderKeeperMarket.Contract.TraderKeeperMarketTransactor.contract.Transact(opts, method, params...)
+}
+
+// Call invokes the (constant) contract method with params as input values and
+// sets the output to result. The result type might be a single field for simple
+// returns, a slice of interfaces for anonymous returns and a struct for named
+// returns.
+func (_TraderKeeperMarket *TraderKeeperMarketCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
+	return _TraderKeeperMarket.Contract.contract.Call(opts, result, method, params...)
+}
+
+// Transfer initiates a plain transaction to move funds to the contract, calling
+// its default method if one is available.
+func (_TraderKeeperMarket *TraderKeeperMarketTransactorRaw) Transfer(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _TraderKeeperMarket.Contract.contract.Transfer(opts)
+}
+
+// Transact invokes the (paid) contract method with params as input values.
+func (_TraderKeeperMarket *TraderKeeperMarketTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
+	return _TraderKeeperMarket.Contract.contract.Transact(opts, method, params...)
+}
+
+// GetOffer is a free data retrieval call binding the contract method 0x4579268a.
+//
+// Solidity: function getOffer(id uint256) constant returns(uint256, address, uint256, address)
+func (_TraderKeeperMarket *TraderKeeperMarketCaller) GetOffer(opts *bind.CallOpts, id *big.Int) (*big.Int, common.Address, *big.Int, common.Address, error) {
+	var (
+		ret0 = new(*big.Int)
+		ret1 = new(common.Address)
+		ret2 = new(*big.Int)
+		ret3 = new(common.Address)
+	)
+	out := &[]interface{}{
+		ret0,
+		ret1,
+		ret2,
+		ret3,
+	}
+	err := _TraderKeeperMarket.contract.Call(opts, out, "getOffer", id)
+	return *ret0, *ret1, *ret2, *ret3, err
+}
+
+// GetOffer is a free data retrieval call binding the contract method 0x4579268a.
+//
+// Solidity: function getOffer(id uint256) constant returns(uint256, address, uint256, address)
+func (_TraderKeeperMarket *TraderKeeperMarketSession) GetOffer(id *big.Int) (*big.Int, common.Address, *big.Int, common.Address, error) {
+	return _TraderKeeperMarket.Contract.GetOffer(&_TraderKeeperMarket.CallOpts, id)
+}
+
+// GetOffer is a free data retrieval call binding the contract method 0x4579268a.
+//
+// Solidity: function getOffer(id uint256) constant returns(uint256, address, uint256, address)
+func (_TraderKeeperMarket *TraderKeeperMarketCallerSession) GetOffer(id *big.Int) (*big.Int, common.Address, *big.Int, common.Address, error) {
+	return _TraderKeeperMarket.Contract.GetOffer(&_TraderKeeperMarket.CallOpts, id)
+}
+
+// Last_offer_id is a free data retrieval call binding the contract method 0x232cae0b.
+//
+// Solidity: function last_offer_id() constant returns(uint256)
+func (_TraderKeeperMarket *TraderKeeperMarketCaller) Last_offer_id(opts *bind.CallOpts) (*big.Int, error) {
+	var (
+		ret0 = new(*big.Int)
+	)
+	out := ret0
+	err := _TraderKeeperMarket.contract.Call(opts, out, "last_offer_id")
+	return *ret0, err
+}
+
+// Last_offer_id is a free data retrieval call binding the contract method 0x232cae0b.
+//
+// Solidity: function last_offer_id() constant returns(uint256)
+func (_TraderKeeperMarket *TraderKeeperMarketSession) Last_offer_id() (*big.Int, error) {
+	return _TraderKeeperMarket.Contract.Last_offer_id(&_TraderKeeperMarket.CallOpts)
+}
+
+// Last_offer_id is a free data retrieval call binding the contract method 0x232cae0b.
+//
+// Solidity: function last_offer_id() constant returns(uint256)
+func (_TraderKeeperMarket *TraderKeeperMarketCallerSession) Last_offer_id() (*big.Int, error) {
+	return _TraderKeeperMarket.Contract.Last_offer_id(&_TraderKeeperMarket.CallOpts)
+}
+
+// Offers is a free data retrieval call binding the contract method 0x8a72ea6a.
+//
+// Solidity: function offers( uint256) constant returns(sell_how_much uint256, sell_which_token address, buy_how_much uint256, buy_which_token address, owner address, active bool)
+func (_TraderKeeperMarket *TraderKeeperMarketCaller) Offers(opts *bind.CallOpts, arg0 *big.Int) (struct {
+	Sell_how_much    *big.Int
+	Sell_which_token common.Address
+	Buy_how_much     *big.Int
+	Buy_which_token  common.Address
+	Owner            common.Address
+	Active           bool
+}, error) {
+	ret := new(struct {
+		Sell_how_much    *big.Int
+		Sell_which_token common.Address
+		Buy_how_much     *big.Int
+		Buy_which_token  common.Address
+		Owner            common.Address
+		Active           bool
+	})
+	out := ret
+	err := _TraderKeeperMarket.contract.Call(opts, out, "offers", arg0)
+	return *ret, err
+}
+
+// Offers is a free data retrieval call binding the contract method 0x8a72ea6a.
+//
+// Solidity: function offers( uint256) constant returns(sell_how_much uint256, sell_which_token address, buy_how_much uint256, buy_which_token address, owner address, active bool)
+func (_TraderKeeperMarket *TraderKeeperMarketSession) Offers(arg0 *big.Int) (struct {
+	Sell_how_much    *big.Int
+	Sell_which_token common.Address
+	Buy_how_much     *big.Int
+	Buy_which_token  common.Address
+	Owner            common.Address
+	Active           bool
+}, error) {
+	return _TraderKeeperMarket.Contract.Offers(&_TraderKeeperMarket.CallOpts, arg0)
+}
+
+// Offers is a free data retrieval call binding the contract method 0x8a72ea6a.
+//
+// Solidity: function offers( uint256) constant returns(sell_how_much uint256, sell_which_token address, buy_how_much uint256, buy_which_token address, owner address, active bool)
+func (_TraderKeeperMarket *TraderKeeperMarketCallerSession) Offers(arg0 *big.Int) (struct {
+	Sell_how_much    *big.Int
+	Sell_which_token common.Address
+	Buy_how_much     *big.Int
+	Buy_which_token  common.Address
+	Owner            common.Address
+	Active           bool
+}, error) {
+	return _TraderKeeperMarket.Contract.Offers(&_TraderKeeperMarket.CallOpts, arg0)
+}
+
+// Buy is a paid mutator transaction binding the contract method 0xd96a094a.
+//
+// Solidity: function buy(id uint256) returns(_success bool)
+func (_TraderKeeperMarket *TraderKeeperMarketTransactor) Buy(opts *bind.TransactOpts, id *big.Int) (*types.Transaction, error) {
+	return _TraderKeeperMarket.contract.Transact(opts, "buy", id)
+}
+
+// Buy is a paid mutator transaction binding the contract method 0xd96a094a.
+//
+// Solidity: function buy(id uint256) returns(_success bool)
+func (_TraderKeeperMarket *TraderKeeperMarketSession) Buy(id *big.Int) (*types.Transaction, error) {
+	return _TraderKeeperMarket.Contract.Buy(&_TraderKeeperMarket.TransactOpts, id)
+}
+
+// Buy is a paid mutator transaction binding the contract method 0xd96a094a.
+//
+// Solidity: function buy(id uint256) returns(_success bool)
+func (_TraderKeeperMarket *TraderKeeperMarketTransactorSession) Buy(id *big.Int) (*types.Transaction, error) {
+	return _TraderKeeperMarket.Contract.Buy(&_TraderKeeperMarket.TransactOpts, id)
+}
+
+// BuyPartial is a paid mutator transaction binding the contract method 0xa5d0bab1.
+//
+// Solidity: function buyPartial(id uint256, quantity uint256) returns(_success bool)
+func (_TraderKeeperMarket *TraderKeeperMarketTransactor) BuyPartial(opts *bind.TransactOpts, id *big.Int, quantity *big.Int) (*types.Transaction, error) {
+	return _TraderKeeperMarket.contract.Transact(opts, "buyPartial", id, quantity)
+}
+
+// BuyPartial is a paid mutator transaction binding the contract method 0xa5d0bab1.
+//
+// Solidity: function buyPartial(id uint256, quantity uint256) returns(_success bool)
+func (_TraderKeeperMarket *TraderKeeperMarketSession) BuyPartial(id *big.Int, quantity *big.Int) (*types.Transaction, error) {
+	return _TraderKeeperMarket.Contract.BuyPartial(&_TraderKeeperMarket.TransactOpts, id, quantity)
+}
+
+// BuyPartial is a paid mutator transaction binding the contract method 0xa5d0bab1.
+//
+// Solidity: function buyPartial(id uint256, quantity uint256) returns(_success bool)
+func (_TraderKeeperMarket *TraderKeeperMarketTransactorSession) BuyPartial(id *big.Int, quantity *big.Int) (*types.Transaction, error) {
+	return _TraderKeeperMarket.Contract.BuyPartial(&_TraderKeeperMarket.TransactOpts, id, quantity)
+}
+
+// Cancel is a paid mutator transaction binding the contract method 0x40e58ee5.
+//
+// Solidity: function cancel(id uint256) returns(_success bool)
+func (_TraderKeeperMarket *TraderKeeperMarketTransactor) Cancel(opts *bind.TransactOpts, id *big.Int) (*types.Transaction, error) {
+	return _TraderKeeperMarket.contract.Transact(opts, "cancel", id)
+}
+
+// Cancel is a paid mutator transaction binding the contract method 0x40e58ee5.
+//
+// Solidity: function cancel(id uint256) returns(_success bool)
+func (_TraderKeeperMarket *TraderKeeperMarketSession) Cancel(id *big.Int) (*types.Transaction, error) {
+	return _TraderKeeperMarket.Contract.Cancel(&_TraderKeeperMarket.TransactOpts, id)
+}
+
+// Cancel is a paid mutator transaction binding the contract method 0x40e58ee5.
+//
+// Solidity: function cancel(id uint256) returns(_success bool)
+func (_TraderKeeperMarket *TraderKeeperMarketTransactorSession) Cancel(id *big.Int) (*types.Transaction, error) {
+	return _TraderKeeperMarket.Contract.Cancel(&_TraderKeeperMarket.TransactOpts, id)
+}
+
+// Offer is a paid mutator transaction binding the contract method 0xf09ea2a6.
+//
+// Solidity: function offer(sell_how_much uint256, sell_which_token address, buy_how_much uint256, buy_which_token address) returns(id uint256)
+func (_TraderKeeperMarket *TraderKeeperMarketTransactor) Offer(opts *bind.TransactOpts, sell_how_much *big.Int, sell_which_token common.Address, buy_how_much *big.Int, buy_which_token common.Address) (*types.Transaction, error) {
+	return _TraderKeeperMarket.contract.Transact(opts, "offer", sell_how_much, sell_which_token, buy_how_much, buy_which_token)
+}
+
+// Offer is a paid mutator transaction binding the contract method 0xf09ea2a6.
+//
+// Solidity: function offer(sell_how_much uint256, sell_which_token address, buy_how_much uint256, buy_which_token address) returns(id uint256)
+func (_TraderKeeperMarket *TraderKeeperMarketSession) Offer(sell_how_much *big.Int, sell_which_token common.Address, buy_how_much *big.Int, buy_which_token common.Address) (*types.Transaction, error) {
+	return _TraderKeeperMarket.Contract.Offer(&_TraderKeeperMarket.TransactOpts, sell_how_much, sell_which_token, buy_how_much, buy_which_token)
+}
+
+// Offer is a paid mutator transaction binding the contract method 0xf09ea2a6.
+//
+// Solidity: function offer(sell_how_much uint256, sell_which_token address, buy_how_much uint256, buy_which_token address) returns(id uint256)
+func (_TraderKeeperMarket *TraderKeeperMarketTransactorSession) Offer(sell_how_much *big.Int, sell_which_token common.Address, buy_how_much *big.Int, buy_which_token common.Address) (*types.Transaction, error) {
+	return _TraderKeeperMarket.Contract.Offer(&_TraderKeeperMarket.TransactOpts, sell_how_much, sell_which_token, buy_how_much, buy_which_token)
 }

@@ -15,17 +15,14 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with M3.  If not, see <http://www.gnu.org/licenses/>.
 
-package adaptor
+package business
 
-import (
-	"math/big"
-
-	"github.com/awishformore/m3/model"
-)
-
-// Market is an interface to interact with a market located on the blockchain.
-type Market interface {
-	Orders() ([]*model.Order, error)
-	Trade(*big.Int, *big.Int) error
-	Close()
+// Logger wraps around a logging interface.
+type Logger interface {
+	Criticalf(format string, v ...interface{})
+	Errorf(format string, v ...interface{})
+	Warningf(format string, v ...interface{})
+	Noticef(format string, v ...interface{})
+	Infof(format string, v ...interface{})
+	Debugf(format string, v ...interface{})
 }

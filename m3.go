@@ -26,22 +26,24 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ogier/pflag"
 
 	"github.com/awishformore/logger"
 
-	"github.com/awishformore/m3/adaptor"
+	"github.com/awishformore/m3/adaptor/arbiter"
 	"github.com/awishformore/m3/business"
 )
 
 const (
-	version string = "0.1.0"
+	major = 0
+	minor = 1
+	patch = 1
 )
 
 func main() {
-
-	// print version info
-	fmt.Fprintf(os.Stderr, "M3 DAEMON V%v\n", version)
 
 	// get current user
 	usr, err := user.Current()
@@ -55,24 +57,44 @@ func main() {
 	ipc := pflag.StringP("ipc", "i", path.Join(usr.HomeDir, ".ethereum", "testnet", "geth.ipc"), "IPC endpoint for Ethereum node")
 	maker := pflag.StringP("maker", "m", "0x5661e7bc2403c7cc08df539e4a8e2972ec256d11", "Maker Market contract address")
 	proxy := pflag.StringP("proxy", "p", "0x5661e7bc2403c7cc08df539e4a8e2972ec256d12", "Trade Proxy contract address")
-	interval := pflag.DurationP("interval", "t", time.Second*14, "interval to check poll for new orders on market")
+	refresh := pflag.DurationP("refresh", "r", time.Second*14, "interval to check poll for new orders on market")
+	threshold := pflag.Uint64P("threshold", "t", 30000, "threshold of profit margin to execute trades")
 	pflag.Parse()
 
 	// initialize logger
 	lvl := logger.ParseLevel(*level)
-	log := logger.New(lvl)
+	log := logger.New(os.Stderr, lvl)
 
+	log.Infof("M3 DAEMON v%v.%v.%v", major, minor, patch)
 	log.Infof("starting m3 daemon...")
 
-	// initialize the blockchain wrapper with the contract addresses
-	market, err := adaptor.NewAtomicMarket(*ipc, *maker, *proxy)
+	// initialize connection to the geth node
+	conn, err := rpc.NewIPCClient(*ipc)
+	if err != nil {
+		log.Criticalf("could not initialize IPC connection: %v (%v)", ipc, err)
+		os.Exit(1)
+	}
+
+	// initialize the contract backend for our wrappers
+	backend := backends.NewRPCBackend(conn)
+
+	// initialize the wrapper around the market contract
+	arb, err := arbiter.NewMaker(
+		backend,
+		common.HexToAddress(*maker),
+		common.HexToAddress(*proxy),
+	)
 	if err != nil {
 		log.Criticalf("could not initialize the blockchain wrapper (%v)", err)
 		os.Exit(1)
 	}
 
 	// initialize matcher logic
-	matcher := business.NewMatcher(log, market, *interval)
+	matcher := business.NewMatcher(
+		log, arb, arb, arb,
+		business.SetRefresh(*refresh),
+		business.SetThreshold(*threshold),
+	)
 
 	log.Infof("m3 daemon startup complete")
 
@@ -85,7 +107,7 @@ func main() {
 
 	// stop execution & free resources on relevant modules
 	matcher.Stop()
-	market.Close()
+	conn.Close()
 
 	log.Infof("m3 daemon shutdown complete")
 

@@ -1,0 +1,4 @@
+- need a way to convert margin from token amounts to wei equivalent (feedbase?)
+- need a way to determine or estimate transaction cost in advance (running average?)
+- only execute arbitrage opportunities if they are estimated to be profitable
+- get token names from token registry for logging of balance changes

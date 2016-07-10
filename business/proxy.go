@@ -15,24 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with M3.  If not, see <http://www.gnu.org/licenses/>.
 
-package model
+package business
 
-import (
-	"math/big"
+import "github.com/awishformore/m3/model"
 
-	"github.com/ethereum/go-ethereum/common"
-)
-
-// Order represents an order on maker market.
-type Order struct {
-	ID         *big.Int
-	BuyToken   common.Address
-	BuyAmount  *big.Int
-	SellToken  common.Address
-	SellAmount *big.Int
-}
-
-// Rate will return the rate between buy and sell amounts.
-func (o Order) Rate() *big.Rat {
-	return new(big.Rat).SetFrac(o.BuyAmount, o.SellAmount)
+// Proxy is a wrapper around a contract that functions as a proxy to the market,
+// allowing us to try executing a pair of trades atomically on the blockchain.
+type Proxy interface {
+	Atomic(*model.Order, *model.Order) (*model.Twin, error)
 }

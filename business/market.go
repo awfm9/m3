@@ -15,24 +15,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with M3.  If not, see <http://www.gnu.org/licenses/>.
 
-package model
+package business
 
-import (
-	"math/big"
+import "github.com/awishformore/m3/model"
 
-	"github.com/ethereum/go-ethereum/common"
-)
-
-// Order represents an order on maker market.
-type Order struct {
-	ID         *big.Int
-	BuyToken   common.Address
-	BuyAmount  *big.Int
-	SellToken  common.Address
-	SellAmount *big.Int
-}
-
-// Rate will return the rate between buy and sell amounts.
-func (o Order) Rate() *big.Rat {
-	return new(big.Rat).SetFrac(o.BuyAmount, o.SellAmount)
+// Market is an interface to interact with a market located on the blockchain.
+type Market interface {
+	Orders() ([]*model.Order, error)
 }

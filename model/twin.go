@@ -17,22 +17,11 @@
 
 package model
 
-import (
-	"math/big"
+import "math/big"
 
-	"github.com/ethereum/go-ethereum/common"
-)
-
-// Order represents an order on maker market.
-type Order struct {
-	ID         *big.Int
-	BuyToken   common.Address
-	BuyAmount  *big.Int
-	SellToken  common.Address
-	SellAmount *big.Int
-}
-
-// Rate will return the rate between buy and sell amounts.
-func (o Order) Rate() *big.Rat {
-	return new(big.Rat).SetFrac(o.BuyAmount, o.SellAmount)
+// Twin represents an executed pair of trades for arbitrage.
+type Twin struct {
+	First  *Margin
+	Second *Margin
+	Cost   *big.Int
 }
