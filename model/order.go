@@ -18,6 +18,7 @@
 package model
 
 import (
+	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -26,13 +27,18 @@ import (
 // Order represents an order on maker market.
 type Order struct {
 	ID         *big.Int
-	BuyToken   common.Address
-	BuyAmount  *big.Int
 	SellToken  common.Address
 	SellAmount *big.Int
+	BuyToken   common.Address
+	BuyAmount  *big.Int
 }
 
 // Rate will return the rate between buy and sell amounts.
 func (o Order) Rate() *big.Rat {
-	return new(big.Rat).SetFrac(o.BuyAmount, o.SellAmount)
+	return new(big.Rat).SetFrac(o.SellAmount, o.BuyAmount)
+}
+
+// String returns a human readable format of the order.
+func (o Order) String() string {
+	return fmt.Sprintf("%v\t(%v:%v)", o.Rate(), o.SellAmount, o.BuyAmount)
 }
