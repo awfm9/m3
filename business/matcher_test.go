@@ -18,7 +18,10 @@
 package business
 
 import (
+	"math/big"
 	"math/rand"
+	"testing"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -27,4 +30,44 @@ func randomAddress() common.Address {
 	bytes := make([]byte, 20)
 	_, _ = rand.Read(bytes)
 	return common.BytesToAddress(bytes)
+}
+
+func randomDuration() time.Duration {
+	seconds := rand.Uint32()
+	return time.Duration(seconds) * time.Second
+}
+
+func TestNewMatcher(t *testing.T) {
+	log := &fakeLog{}
+	market := &fakeMarket{}
+	proxy := &fakeProxy{}
+	wallet := &fakeWallet{}
+	threshold := uint64(rand.Uint32())
+	refresh := randomDuration()
+	matcher := NewMatcher(
+		log, market, proxy, wallet,
+		SetThreshold(threshold),
+		SetRefresh(refresh),
+	)
+	if matcher.log != log {
+		t.Errorf("did not save log reference on creation")
+	}
+	if matcher.market != market {
+		t.Errorf("did not save market reference on creation")
+	}
+	if matcher.proxy != proxy {
+		t.Errorf("did not save proxy referenc on creation")
+	}
+	if matcher.wallet != wallet {
+		t.Errorf("did not save wallet reference on creation")
+	}
+	if matcher.threshold.Cmp(new(big.Int).SetUint64(threshold)) != 0 {
+		t.Errorf("did not save threshold amount on creation")
+	}
+	if matcher.refresh != refresh {
+		t.Errorf("did not save refresh duration on creation")
+	}
+	if matcher.done == nil {
+		t.Errorf("did not create done channel on creation")
+	}
 }
