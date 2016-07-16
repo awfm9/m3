@@ -22,15 +22,12 @@ import (
 	"sort"
 
 	"github.com/awishformore/m3/model"
-	"github.com/ethereum/go-ethereum/common"
 )
 
 // Book represents an order book for either bids or asks.
 type Book struct {
-	Base  common.Address
-	Quote common.Address
-	bids  []*model.Order
-	asks  []*model.Order
+	bids []*model.Order
+	asks []*model.Order
 }
 
 // AddBid will add an order to the orders.
