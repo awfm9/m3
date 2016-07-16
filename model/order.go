@@ -33,9 +33,14 @@ type Order struct {
 	BuyAmount  *big.Int
 }
 
-// Rate will return the rate between buy and sell amounts.
+// Rate will return the rate between sell and buy amounts (for bids).
 func (o Order) Rate() *big.Rat {
 	return new(big.Rat).SetFrac(o.SellAmount, o.BuyAmount)
+}
+
+// Inverse returns the inverted rate between sell and buy amounts (for asks).
+func (o Order) Inverse() *big.Rat {
+	return new(big.Rat).Inv(o.Rate())
 }
 
 // ToSellAmount returns a buy token amount in equivalent of sell tokens.

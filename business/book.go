@@ -94,4 +94,4 @@ type ByRateAsc []*model.Order
 
 func (brd ByRateAsc) Len() int               { return len(brd) }
 func (brd ByRateAsc) Swap(i int, j int)      { brd[i], brd[j] = brd[j], brd[i] }
-func (brd ByRateAsc) Less(i int, j int) bool { return brd[i].Rate().Cmp(brd[j].Rate()) < 0 }
+func (brd ByRateAsc) Less(i int, j int) bool { return brd[i].Inverse().Cmp(brd[j].Inverse()) < 0 }
