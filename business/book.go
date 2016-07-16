@@ -47,6 +47,16 @@ func (b *Book) HighestBid() (*model.Order, error) {
 	return b.bids[0], nil
 }
 
+// PopBid will remove the highest bid order.
+func (b *Book) PopBid() error {
+	if len(b.bids) == 0 {
+		return fmt.Errorf("no bids in book")
+	}
+	sort.Sort(ByRateDesc(b.bids))
+	b.bids = b.bids[1:]
+	return nil
+}
+
 // AddAsk will sort the orders by increasing price.
 func (b *Book) AddAsk(order *model.Order) {
 	b.asks = append(b.asks, order)
@@ -59,6 +69,16 @@ func (b *Book) LowestAsk() (*model.Order, error) {
 	}
 	sort.Sort(ByRateAsc(b.asks))
 	return b.asks[0], nil
+}
+
+// PopAsk will remove the lowest ask order.
+func (b *Book) PopAsk() error {
+	if len(b.asks) == 0 {
+		return fmt.Errorf("no asks in book")
+	}
+	sort.Sort(ByRateAsc(b.asks))
+	b.asks = b.asks[1:]
+	return nil
 }
 
 // ByRateDesc defines sorting by descending rate, putting the top rate as the first element.

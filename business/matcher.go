@@ -21,9 +21,6 @@ import (
 	"fmt"
 	"math/big"
 	"time"
-
-	"github.com/awishformore/m3/model"
-	"github.com/ethereum/go-ethereum/common"
 )
 
 // Matcher is a market matcher that will try to match overlapping orders against
@@ -120,53 +117,12 @@ Loop:
 			// try matching the orders of each for trade opportunities
 			// we need to take into account available balances and deduce them as they
 			// get used up
-			twins, err := m.arbitrage(books)
+			m.arbitrage(books)
 			if err != nil {
 				m.log.Errorf("could not compute arbitrage orders (%v)", err)
 				continue
 			}
 
-			// calculate total cost and margin made for each token
-			cost := new(big.Int)
-			changes := make(map[common.Address]*big.Int)
-			for _, twin := range twins {
-
-				// add cost
-				cost.Add(cost, twin.Cost)
-
-				// check if change in token exists, if not create, then add
-				first, ok := changes[twin.First.Token]
-				if !ok {
-					first = big.NewInt(0)
-					changes[twin.First.Token] = first
-				}
-				first.Add(first, twin.First.Amount)
-
-				// check if change in second token exists, if not create and add
-				second, ok := changes[twin.Second.Token]
-				if !ok {
-					second = big.NewInt(0)
-					changes[twin.Second.Token] = second
-				}
-				second.Add(second, twin.Second.Amount)
-			}
-
-			m.log.Infof("executed %v twins for cost of %v wei", len(twins))
-
-			for address, change := range changes {
-
-				// get current balance
-				balance, err := m.wallet.Balance(address)
-				if err != nil {
-					m.log.Warningf("could not get current balance: %v (%v)", address, err)
-					continue
-				}
-
-				// print the token details and change in balance
-				m.log.Infof("%v: %v (%v)", address, balance, change)
-			}
-
-			m.log.Infof("total cost: %v wei", cost)
 		}
 	}
 }
@@ -207,10 +163,7 @@ func (m *Matcher) getBooks(market Market) ([]*Book, error) {
 		}
 
 		// if no book was found for pair or inversed pair, create bid book
-		book := Book{
-			Base:  order.BuyToken,
-			Quote: order.SellToken,
-		}
+		book := Book{}
 		book.AddBid(order)
 		bookSet[bidPair] = &book
 	}
@@ -224,14 +177,12 @@ func (m *Matcher) getBooks(market Market) ([]*Book, error) {
 	return books, nil
 }
 
-func (m *Matcher) arbitrage(books []*Book) ([]*model.Twin, error) {
-
-	// create empty executed trades book
-	twins := []*model.Twin{}
+func (m *Matcher) arbitrage(books []*Book) {
 
 	// for each book, check if there are overlapping orders
-BookLoop:
-	for _, book := range books {
+	for pair, book := range books {
+
+		m.log.Infof("trading book for pair: %v (%v bids, %v asks)", pair, len(book.bids), len(book.asks))
 
 		// keep processing book until no matching orders
 		for {
@@ -239,90 +190,118 @@ BookLoop:
 			// get highest bid, go to next book if none found
 			bid, err := book.HighestBid()
 			if err != nil {
+				m.log.Infof("could not retrieve highest bid (%v)", err)
 				break
 			}
 
 			// get lowest ask, go to next book if none found
 			ask, err := book.LowestAsk()
 			if err != nil {
+				m.log.Infof("could not retrieve highest ask (%v)", err)
 				break
 			}
 
 			// check if the prices overlap
 			if bid.Rate().Cmp(ask.Rate()) <= 0 {
+				m.log.Infof("could not find overlapping orders (bid: %v, ask: %v)", bid.Rate(), ask.Rate())
 				break
 			}
 
-			// base token is what the bid wants to buy and the ask wants to sell
-			if bid.BuyToken != ask.SellToken {
-				m.log.Errorf("base token mismatch in book: %v", book)
-				continue BookLoop
-			}
-			base := bid.BuyToken
-
-			// quote token is what the bid wants to sell and the ask wants to buy
-			if bid.SellToken != ask.BuyToken {
-				m.log.Errorf("quote token mismatch in book: %v", book)
-				continue BookLoop
-			}
-			quote := bid.SellToken
-
-			// the possible amount of base token to sell on first trade
-			baseAvailable, err := m.atomic.Balance(base)
+			// get available base amount (input to first, output of second)
+			baseAvailable, err := m.wallet.Balance(bid.BuyToken)
 			if err != nil {
-				m.log.Errorf("could not get balance for base token: %v (%v)", base, err)
-				continue BookLoop
+				m.log.Errorf("could not get base balance: %v (%v)", bid.BuyToken, err)
+				break
 			}
 
-			// the possible amount of the quote token to sell on first trade
-			quoteAvailable, err := m.atomic.Balance(quote)
+			// get available quote amount (output of first, input to second)
+			quoteAvailable, err := m.wallet.Balance(bid.SellToken)
 			if err != nil {
-				m.log.Errorf("could not get balance for quote token: %v (%v)", quote, err)
-				continue BookLoop
+				m.log.Errorf("could not get quote balance: %v (%v)", bid.SellToken, err)
+				break
 			}
 
-			// if the max base amount is enough to fill the first order, start there
-			baseAmount := Max(baseAvailable, bid.BuyAmount, ask.SellAmount)
-			if baseAmount.Cmp(bid.BuyAmount) == 0 {
-				// TODO execute first order, then second
-			}
-
-			// if the max quote amount is enough to fill the second order, start there
-			quoteAmount := Max(quoteAvailable, bid.SellAmount, ask.BuyAmount)
-			if quoteAmount.Cmp(ask.BuyAmount) == 0 {
-				// TODO execute second order, then first
-			}
-
-			// otherwise, calculate maximum base amount equivalent for quote
-			quoteAsBase := new(big.Int).Mul(quoteAmount, ask.SellAmount)
-			quoteAsBase.Div(quoteAsBase, ask.BuyAmount)
-
-			// if they are both zero, we can't trade anything
+			// if both available balances are zero, we can't trade
 			zero := big.NewInt(0)
-			if baseAmount.Cmp(zero) == 0 && quoteAsBase.Cmp(zero) == 0 {
-				m.log.Warningf("can't trade marginal amounts: %v & %v", baseAmount, quoteAmount)
-				continue BookLoop
+			if baseAvailable.Cmp(zero) == 0 && quoteAvailable.Cmp(zero) == 0 {
+				m.log.Noticef("could not find tradable balances: %v & %v", bid.BuyToken, bid.SellToken)
+				break
 			}
 
-			// then go for the highest one
-			if baseAmount.Cmp(quoteAsBase) > 0 {
-				// TODO execute first order, then second
+			// calculate trade volume if trading bid first and ask second
+			firstBase := Max(baseAvailable, bid.BuyAmount, ask.SellAmount)
+			quoteAfter := new(big.Int).Add(quoteAvailable, bid.ToSellAmount(firstBase))
+			firstQuote := Max(quoteAfter, bid.SellAmount, ask.BuyAmount)
+			firstTotal := new(big.Int).Add(firstBase, bid.ToBuyAmount(firstQuote))
+
+			// calculate tradable volume if trading ask first and bid second
+			secondQuote := Max(quoteAvailable, bid.SellAmount, ask.BuyAmount)
+			baseAfter := new(big.Int).Add(baseAvailable, ask.ToSellAmount(secondQuote))
+			secondBase := Max(baseAfter, bid.BuyAmount, ask.SellAmount)
+			secondTotal := new(big.Int).Add(secondBase, bid.ToBuyAmount(secondQuote))
+
+			// if first path is more profitable, trade bid then ask
+			if firstTotal.Cmp(secondTotal) >= 0 {
+
+				// atomically execute trade with bid order, then trade with ask order
+				_, err = m.atomic.ExecuteAtomic(bid, firstBase, ask, firstQuote)
+				if err != nil {
+					m.log.Errorf("could not execute first atomic trade pair (%v)", err)
+					break
+				}
+
+				// adjust the bid amounts
+				bid.BuyAmount.Sub(bid.BuyAmount, firstBase)
+				bid.SellAmount.Sub(bid.SellAmount, bid.ToSellAmount(firstBase))
+
+				// adjust the ask amounts
+				ask.BuyAmount.Sub(ask.BuyAmount, firstQuote)
+				ask.SellAmount.Sub(ask.SellAmount, ask.ToSellAmount(firstQuote))
+
 			} else {
-				// TODO execute second order, then first
+
+				// atomically execute trade with ask order, then trade with bid order
+				_, err = m.atomic.ExecuteAtomic(ask, secondQuote, bid, secondBase)
+				if err != nil {
+					m.log.Errorf("could not execute second atomic trade pair (%v)", err)
+					break
+				}
+
+				// adjust the bid amounts
+				bid.BuyAmount.Sub(bid.BuyAmount, secondBase)
+				bid.SellAmount.Sub(bid.SellAmount, bid.ToSellAmount(secondBase))
+
+				// adjust the ask amounts
+				ask.BuyAmount.Sub(ask.BuyAmount, secondQuote)
+				ask.SellAmount.Sub(ask.SellAmount, ask.ToSellAmount(secondQuote))
+			}
+
+			// remove any order that is no longer valid (any balance zero)
+			if !bid.Valid() {
+				err = book.PopBid()
+				if err != nil {
+					m.log.Errorf("could not pop bid from book (%v)", err)
+					break
+				}
+			}
+			if !ask.Valid() {
+				err = book.PopAsk()
+				if err != nil {
+					m.log.Errorf("could not pop ask from book (%v)", err)
+					break
+				}
 			}
 		}
 	}
-
-	return twins, nil
 }
 
 // Max returns the maximum of three big ints.
-func Max(x *big.Int, y *big.Int, z *big.Int) *big.Int {
-	if x.Cmp(y) >= 0 && x.Cmp(z) >= 0 {
-		return x
+func Max(numbers ...*big.Int) *big.Int {
+	max := big.NewInt(0)
+	for _, number := range numbers {
+		if number.Cmp(max) > 0 {
+			max.Set(number)
+		}
 	}
-	if y.Cmp(x) >= 0 && y.Cmp(z) >= 0 {
-		return y
-	}
-	return z
+	return max
 }

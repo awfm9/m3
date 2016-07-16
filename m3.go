@@ -33,7 +33,7 @@ import (
 
 	"github.com/awishformore/logger"
 
-	"github.com/awishformore/m3/adaptor/arbiter"
+	"github.com/awishformore/m3/adaptor/atomic"
 	"github.com/awishformore/m3/business"
 )
 
@@ -79,7 +79,7 @@ func main() {
 	backend := backends.NewRPCBackend(conn)
 
 	// initialize the wrapper around the market contract
-	arb, err := arbiter.NewMaker(
+	atom, err := atomic.NewMaker(
 		backend,
 		common.HexToAddress(*maker),
 		common.HexToAddress(*proxy),
@@ -91,7 +91,7 @@ func main() {
 
 	// initialize matcher logic
 	matcher := business.NewMatcher(
-		log, arb, arb, arb,
+		log, atom,
 		business.SetRefresh(*refresh),
 		business.SetThreshold(*threshold),
 	)

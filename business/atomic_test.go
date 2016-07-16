@@ -28,6 +28,6 @@ type fakeAtomic struct {
 	fakeWallet
 }
 
-func (fa *fakeAtomic) ExecuteAtomic(first *model.Order, firstAmount *big.Int, second *model.Order, secondAmount *big.Int) error {
-	return nil
+func (fa *fakeAtomic) ExecuteAtomic(first *model.Order, firstAmount *big.Int, second *model.Order, secondAmount *big.Int) (*big.Int, error) {
+	return nil, nil
 }

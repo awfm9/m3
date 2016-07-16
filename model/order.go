@@ -38,7 +38,35 @@ func (o Order) Rate() *big.Rat {
 	return new(big.Rat).SetFrac(o.SellAmount, o.BuyAmount)
 }
 
+// ToSellAmount returns a buy token amount in equivalent of sell tokens.
+func (o Order) ToSellAmount(buyAmount *big.Int) *big.Int {
+	sellAmount := new(big.Int).Set(buyAmount)
+	sellAmount.Mul(sellAmount, o.SellAmount)
+	sellAmount.Div(sellAmount, o.BuyAmount)
+	return sellAmount
+}
+
+// ToBuyAmount returns a sell token amount in equivalent of buy tokens.
+func (o Order) ToBuyAmount(sellAmount *big.Int) *big.Int {
+	buyAmount := new(big.Int).Set(sellAmount)
+	buyAmount.Mul(buyAmount, o.BuyAmount)
+	buyAmount.Div(buyAmount, o.SellAmount)
+	return buyAmount
+}
+
 // String returns a human readable format of the order.
 func (o Order) String() string {
 	return fmt.Sprintf("%v\t(%v:%v)", o.Rate(), o.SellAmount, o.BuyAmount)
+}
+
+// Valid returns false if either sell or buy amount is zero.
+func (o Order) Valid() bool {
+	zero := big.NewInt(0)
+	if o.SellAmount.Cmp(zero) == 0 {
+		return false
+	}
+	if o.BuyAmount.Cmp(zero) == 0 {
+		return false
+	}
+	return true
 }

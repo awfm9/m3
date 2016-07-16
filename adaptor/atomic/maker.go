@@ -104,53 +104,27 @@ func (mm *Maker) Orders() ([]*model.Order, error) {
 	return orders, nil
 }
 
-// ExecuteAtomic will execute the trades with the two given orders.
-func (mm *Maker) ExecuteAtomic(first *model.Order, second *model.Order) (*model.Twin, error) {
+// ExecuteFull blabla...
+// TODO
+func (mm *Maker) ExecuteFull(*model.Order) error {
+	return nil
+}
 
-	// check our balances before the trade
-	beforeFirst, err := mm.proxy.BalanceOf(nil, first.BuyToken)
-	if err != nil {
-		return nil, fmt.Errorf("could not check first token before twin (%v)", err)
-	}
-	beforeSecond, err := mm.proxy.BalanceOf(nil, first.SellToken)
-	if err != nil {
-		return nil, fmt.Errorf("could not check second token before twin (%v)", err)
-	}
+// ExecutePartial blabla...
+// TODO
+func (mm *Maker) ExecutePartial(*model.Order, *big.Int) error {
+	return nil
+}
+
+// ExecuteAtomic will execute the trades with the two given orders.
+func (mm *Maker) ExecuteAtomic(first *model.Order, firstAmount *big.Int, second *model.Order, secondAmount *big.Int) (*big.Int, error) {
 
 	// execute the trades using the market proxy
 	info, err := mm.proxy.Trade(nil, first.ID, second.ID, first.BuyToken, second.BuyToken, mm.address)
 	if err != nil {
 		return nil, fmt.Errorf("could not atomically execute trades (%v)", err)
 	}
-
-	// check our balances after the trade
-	afterFirst, err := mm.proxy.BalanceOf(nil, first.BuyToken)
-	if err != nil {
-		return nil, fmt.Errorf("could not check first token after twin (%v)", err)
-	}
-	afterSecond, err := mm.proxy.BalanceOf(nil, first.SellToken)
-	if err != nil {
-		return nil, fmt.Errorf("could not check second token after twin (%v)", err)
-	}
-
-	// calculate margins
-	marginFirst := model.Margin{
-		Amount: new(big.Int).Sub(beforeFirst, afterFirst),
-		Token:  first.BuyToken,
-	}
-	marginSecond := model.Margin{
-		Amount: new(big.Int).Sub(beforeSecond, afterSecond),
-		Token:  first.SellToken,
-	}
-
-	// create the twin
-	twin := model.Twin{
-		First:  &marginFirst,
-		Second: &marginSecond,
-		Cost:   info.Cost(),
-	}
-
-	return &twin, nil
+	return info.Cost(), nil
 }
 
 // Balance returns the balance currently held in our proxy.
@@ -163,4 +137,22 @@ func (mm *Maker) Balance(address common.Address) (*big.Int, error) {
 	}
 
 	return balance, nil
+}
+
+// Transfer blabla...
+// TODO
+func (mm *Maker) Transfer(token common.Address, recipient common.Address, amount *big.Int) error {
+	return nil
+}
+
+// Allowance blabla...
+// TODO
+func (mm *Maker) Allowance(token common.Address, address common.Address) (*big.Int, error) {
+	return nil, nil
+}
+
+// Approve blabla...
+// TODO
+func (mm *Maker) Approve(token common.Address, address common.Address, amount *big.Int) error {
+	return nil
 }

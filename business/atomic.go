@@ -28,5 +28,5 @@ import (
 type Atomic interface {
 	Market
 	Wallet
-	ExecuteAtomic(first *model.Order, firstAmount *big.Int, second *model.Order, secondAmount *big.Int) error
+	ExecuteAtomic(first *model.Order, firstAmount *big.Int, second *model.Order, secondAmount *big.Int) (*big.Int, error)
 }
