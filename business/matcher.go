@@ -244,36 +244,60 @@ func (m *Matcher) arbitrage(books []*Book) {
 			if firstTotal.Cmp(secondTotal) >= 0 {
 
 				// atomically execute trade with bid order, then trade with ask order
-				_, err = m.atomic.ExecuteAtomic(bid, firstBase, ask, firstQuote)
+				var cost *big.Int
+				cost, err = m.atomic.ExecuteAtomic(bid, firstBase, ask, firstQuote)
 				if err != nil {
 					m.log.Errorf("could not execute first atomic trade pair (%v)", err)
 					break
 				}
 
+				// calculate the remaining traded amounts for both orders
+				bidQuote := bid.ToSellAmount(firstBase)
+				askBase := ask.ToSellAmount(firstQuote)
+
+				// calculate the differences to see our profit
+				deltaBase := new(big.Int).Sub(askBase, firstBase)
+				deltaQuote := new(big.Int).Sub(bidQuote, firstQuote)
+
+				m.log.Infof("made %v (%v) and %v (%v) for %v (wei) on first path",
+					deltaBase, bid.BuyToken, deltaQuote, bid.SellToken, cost)
+
 				// adjust the bid amounts
 				bid.BuyAmount.Sub(bid.BuyAmount, firstBase)
-				bid.SellAmount.Sub(bid.SellAmount, bid.ToSellAmount(firstBase))
+				bid.SellAmount.Sub(bid.SellAmount, bidQuote)
 
 				// adjust the ask amounts
 				ask.BuyAmount.Sub(ask.BuyAmount, firstQuote)
-				ask.SellAmount.Sub(ask.SellAmount, ask.ToSellAmount(firstQuote))
+				ask.SellAmount.Sub(ask.SellAmount, askBase)
 
 			} else {
 
 				// atomically execute trade with ask order, then trade with bid order
-				_, err = m.atomic.ExecuteAtomic(ask, secondQuote, bid, secondBase)
+				var cost *big.Int
+				cost, err = m.atomic.ExecuteAtomic(ask, secondQuote, bid, secondBase)
 				if err != nil {
 					m.log.Errorf("could not execute second atomic trade pair (%v)", err)
 					break
 				}
 
+				// calculate the remaining traded amounts for both orders
+				bidQuote := bid.ToSellAmount(secondBase)
+				askBase := bid.ToSellAmount(secondQuote)
+
+				// calculate the differences to see our profit
+				deltaBase := new(big.Int).Sub(askBase, secondBase)
+				deltaQuote := new(big.Int).Sub(bidQuote, secondQuote)
+
+				m.log.Infof("made %v (%v) and %v (%v) for %v (wei) on second path",
+					deltaBase, bid.BuyToken, deltaQuote, bid.SellToken, cost)
+
 				// adjust the bid amounts
 				bid.BuyAmount.Sub(bid.BuyAmount, secondBase)
-				bid.SellAmount.Sub(bid.SellAmount, bid.ToSellAmount(secondBase))
+				bid.SellAmount.Sub(bid.SellAmount, bidQuote)
 
 				// adjust the ask amounts
 				ask.BuyAmount.Sub(ask.BuyAmount, secondQuote)
-				ask.SellAmount.Sub(ask.SellAmount, ask.ToSellAmount(secondQuote))
+				ask.SellAmount.Sub(ask.SellAmount, askBase)
 			}
 
 			// remove any order that is no longer valid (any balance zero)
