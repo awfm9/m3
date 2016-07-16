@@ -19,7 +19,6 @@ package business
 
 import (
 	"math/big"
-	"math/rand"
 
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -27,7 +26,18 @@ import (
 type fakeWallet struct {
 }
 
-func (*fakeWallet) Balance(common.Address) (*big.Int, error) {
-	amount := big.NewInt(rand.Int63())
-	return amount, nil
+func (fw *fakeWallet) Balance(token common.Address) (*big.Int, error) {
+	return nil, nil
+}
+
+func (fw *fakeWallet) Transfer(token common.Address, recipient common.Address, amount *big.Int) error {
+	return nil
+}
+
+func (fw *fakeWallet) Allowance(token common.Address, proxy common.Address) (*big.Int, error) {
+	return nil, nil
+}
+
+func (fw *fakeWallet) Approve(token common.Address, proxy common.Address, amount *big.Int) error {
+	return nil
 }

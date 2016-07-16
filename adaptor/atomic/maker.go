@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with M3.  If not, see <http://www.gnu.org/licenses/>.
 
-package arbiter
+package atomic
 
 import (
 	"fmt"
@@ -104,8 +104,8 @@ func (mm *Maker) Orders() ([]*model.Order, error) {
 	return orders, nil
 }
 
-// Atomic will execute the trades with the two given orders.
-func (mm *Maker) Atomic(first *model.Order, second *model.Order) (*model.Twin, error) {
+// ExecuteAtomic will execute the trades with the two given orders.
+func (mm *Maker) ExecuteAtomic(first *model.Order, second *model.Order) (*model.Twin, error) {
 
 	// check our balances before the trade
 	beforeFirst, err := mm.proxy.BalanceOf(nil, first.BuyToken)

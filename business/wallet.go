@@ -23,7 +23,11 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-// Wallet represents a wallet or contract with a balance for various tokens.
+// Wallet wraps a wallet address with all necessary functions to transfer ERC20
+// tokens and grant rights to transfer them on our behalf.
 type Wallet interface {
-	Balance(common.Address) (*big.Int, error)
+	Balance(token common.Address) (*big.Int, error)
+	Transfer(token common.Address, recipient common.Address, amount *big.Int) error
+	Allowance(token common.Address, proxy common.Address) (*big.Int, error)
+	Approve(token common.Address, proxy common.Address, amount *big.Int) error
 }

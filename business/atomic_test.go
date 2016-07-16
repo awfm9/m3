@@ -17,10 +17,17 @@
 
 package business
 
-import "github.com/awishformore/m3/model"
+import (
+	"math/big"
 
-// Proxy is a wrapper around a contract that functions as a proxy to the market,
-// allowing us to try executing a pair of trades atomically on the blockchain.
-type Proxy interface {
-	Atomic(*model.Order, *model.Order) (*model.Twin, error)
+	"github.com/awishformore/m3/model"
+)
+
+type fakeAtomic struct {
+	fakeMarket
+	fakeWallet
+}
+
+func (fa *fakeAtomic) ExecuteAtomic(first *model.Order, firstAmount *big.Int, second *model.Order, secondAmount *big.Int) error {
+	return nil
 }

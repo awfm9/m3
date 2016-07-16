@@ -30,8 +30,7 @@ import (
 // each other.
 type Matcher struct {
 	log       Logger
-	market    Market
-	proxy     Proxy
+	atomic    Atomic
 	wallet    Wallet
 	threshold *big.Int
 	refresh   time.Duration
@@ -39,14 +38,12 @@ type Matcher struct {
 }
 
 // NewMatcher creates a new market matcher that will try to execute trades against each other.
-func NewMatcher(log Logger, market Market, proxy Proxy, wallet Wallet, options ...func(*Matcher)) *Matcher {
+func NewMatcher(log Logger, atomic Atomic, options ...func(*Matcher)) *Matcher {
 
 	// create the channel to signal shutdown
 	m := Matcher{
 		log:       log,
-		market:    market,
-		proxy:     proxy,
-		wallet:    wallet,
+		atomic:    atomic,
 		threshold: big.NewInt(30000),
 		refresh:   time.Minute,
 		done:      make(chan struct{}),
@@ -114,7 +111,7 @@ Loop:
 		case <-refresh:
 
 			// try getting all the orders from the contract
-			books, err := m.getBooks(m.market)
+			books, err := m.getBooks(m.atomic)
 			if err != nil {
 				m.log.Errorf("could not get orders (%v)", err)
 				continue
@@ -183,7 +180,7 @@ func (m *Matcher) getBooks(market Market) ([]*Book, error) {
 	bookSet := make(map[string]*Book)
 
 	// retrieve valid orders from contract
-	orders, err := m.market.Orders()
+	orders, err := market.Orders()
 	if err != nil {
 		return nil, fmt.Errorf("could not retrieve orders from market (%v)", err)
 	}
@@ -233,6 +230,7 @@ func (m *Matcher) arbitrage(books []*Book) ([]*model.Twin, error) {
 	twins := []*model.Twin{}
 
 	// for each book, check if there are overlapping orders
+BookLoop:
 	for _, book := range books {
 
 		// keep processing book until no matching orders
@@ -255,16 +253,76 @@ func (m *Matcher) arbitrage(books []*Book) ([]*model.Twin, error) {
 				break
 			}
 
-			// execute the trade
-			twin, err := m.proxy.Atomic(bid, ask)
+			// base token is what the bid wants to buy and the ask wants to sell
+			if bid.BuyToken != ask.SellToken {
+				m.log.Errorf("base token mismatch in book: %v", book)
+				continue BookLoop
+			}
+			base := bid.BuyToken
+
+			// quote token is what the bid wants to sell and the ask wants to buy
+			if bid.SellToken != ask.BuyToken {
+				m.log.Errorf("quote token mismatch in book: %v", book)
+				continue BookLoop
+			}
+			quote := bid.SellToken
+
+			// the possible amount of base token to sell on first trade
+			baseAvailable, err := m.atomic.Balance(base)
 			if err != nil {
-				m.log.Warningf("failed to execute atomic trades: %v & %v", bid.ID, ask.ID)
-				break
+				m.log.Errorf("could not get balance for base token: %v (%v)", base, err)
+				continue BookLoop
 			}
 
-			twins = append(twins, twin)
+			// the possible amount of the quote token to sell on first trade
+			quoteAvailable, err := m.atomic.Balance(quote)
+			if err != nil {
+				m.log.Errorf("could not get balance for quote token: %v (%v)", quote, err)
+				continue BookLoop
+			}
+
+			// if the max base amount is enough to fill the first order, start there
+			baseAmount := Max(baseAvailable, bid.BuyAmount, ask.SellAmount)
+			if baseAmount.Cmp(bid.BuyAmount) == 0 {
+				// TODO execute first order, then second
+			}
+
+			// if the max quote amount is enough to fill the second order, start there
+			quoteAmount := Max(quoteAvailable, bid.SellAmount, ask.BuyAmount)
+			if quoteAmount.Cmp(ask.BuyAmount) == 0 {
+				// TODO execute second order, then first
+			}
+
+			// otherwise, calculate maximum base amount equivalent for quote
+			quoteAsBase := new(big.Int).Mul(quoteAmount, ask.SellAmount)
+			quoteAsBase.Div(quoteAsBase, ask.BuyAmount)
+
+			// if they are both zero, we can't trade anything
+			zero := big.NewInt(0)
+			if baseAmount.Cmp(zero) == 0 && quoteAsBase.Cmp(zero) == 0 {
+				m.log.Warningf("can't trade marginal amounts: %v & %v", baseAmount, quoteAmount)
+				continue BookLoop
+			}
+
+			// then go for the highest one
+			if baseAmount.Cmp(quoteAsBase) > 0 {
+				// TODO execute first order, then second
+			} else {
+				// TODO execute second order, then first
+			}
 		}
 	}
 
 	return twins, nil
+}
+
+// Max returns the maximum of three big ints.
+func Max(x *big.Int, y *big.Int, z *big.Int) *big.Int {
+	if x.Cmp(y) >= 0 && x.Cmp(z) >= 0 {
+		return x
+	}
+	if y.Cmp(x) >= 0 && y.Cmp(z) >= 0 {
+		return y
+	}
+	return z
 }

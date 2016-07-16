@@ -18,6 +18,7 @@
 package business
 
 import (
+	"encoding/binary"
 	"math/big"
 	"math/rand"
 	"testing"
@@ -26,40 +27,44 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-func randomAddress() common.Address {
+func randAddress() common.Address {
 	bytes := make([]byte, 20)
 	_, _ = rand.Read(bytes)
 	return common.BytesToAddress(bytes)
 }
 
-func randomDuration() time.Duration {
+func randDuration() time.Duration {
 	seconds := rand.Uint32()
 	return time.Duration(seconds) * time.Second
 }
 
+func randUint64() uint64 {
+	bytes := make([]byte, 8)
+	_, _ = rand.Read(bytes)
+	return binary.BigEndian.Uint64(bytes)
+}
+
+func randInt64() int64 {
+	bytes := make([]byte, 8)
+	_, _ = rand.Read(bytes)
+	return rand.Int63()
+}
+
 func TestNewMatcher(t *testing.T) {
-	log := &fakeLog{}
-	market := &fakeMarket{}
-	proxy := &fakeProxy{}
-	wallet := &fakeWallet{}
-	threshold := uint64(rand.Uint32())
-	refresh := randomDuration()
+	log := &fakeLogger{}
+	atomic := &fakeAtomic{}
+	threshold := randUint64()
+	refresh := randDuration()
 	matcher := NewMatcher(
-		log, market, proxy, wallet,
+		log, atomic,
 		SetThreshold(threshold),
 		SetRefresh(refresh),
 	)
 	if matcher.log != log {
 		t.Errorf("did not save log reference on creation")
 	}
-	if matcher.market != market {
-		t.Errorf("did not save market reference on creation")
-	}
-	if matcher.proxy != proxy {
-		t.Errorf("did not save proxy referenc on creation")
-	}
-	if matcher.wallet != wallet {
-		t.Errorf("did not save wallet reference on creation")
+	if matcher.atomic != atomic {
+		t.Errorf("did not save atomic reference on creation")
 	}
 	if matcher.threshold.Cmp(new(big.Int).SetUint64(threshold)) != 0 {
 		t.Errorf("did not save threshold amount on creation")

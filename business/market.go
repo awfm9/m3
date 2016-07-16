@@ -17,9 +17,15 @@
 
 package business
 
-import "github.com/awishformore/m3/model"
+import (
+	"math/big"
+
+	"github.com/awishformore/m3/model"
+)
 
 // Market is an interface to interact with a market located on the blockchain.
 type Market interface {
 	Orders() ([]*model.Order, error)
+	ExecuteFull(*model.Order) error
+	ExecutePartial(*model.Order, *big.Int) error
 }
