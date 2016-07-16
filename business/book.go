@@ -52,7 +52,9 @@ func (b *Book) PopBid() error {
 	if len(b.bids) == 0 {
 		return fmt.Errorf("no bids in book")
 	}
-	sort.Sort(ByRateDesc(b.bids))
+	if b.bids[0].Valid() {
+		return fmt.Errorf("can't pop valid bid")
+	}
 	b.bids = b.bids[1:]
 	return nil
 }
@@ -76,7 +78,9 @@ func (b *Book) PopAsk() error {
 	if len(b.asks) == 0 {
 		return fmt.Errorf("no asks in book")
 	}
-	sort.Sort(ByRateAsc(b.asks))
+	if b.asks[0].Valid() {
+		return fmt.Errorf("can't pop valid ask")
+	}
 	b.asks = b.asks[1:]
 	return nil
 }
