@@ -24,40 +24,34 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 
+	"github.com/awishformore/m3/adaptor/contract"
+	"github.com/awishformore/m3/binding"
 	"github.com/awishformore/m3/business"
-	"github.com/awishformore/m3/contract"
 	"github.com/awishformore/m3/model"
 )
 
 // M3Wallet represents a custom wallet used in this daemon, capable of executing
 // atomic trades against a market.
 type M3Wallet struct {
-	backend bind.ContractBackend
-	address common.Address
-	wallet  *contract.M3Wallet
+	*contract.Ethereum
+	wallet *binding.M3Wallet
 }
 
 // NewM3 creates a new M3 wallet.
 func NewM3(backend bind.ContractBackend, address common.Address) (*M3Wallet, error) {
 
 	// bind market contract
-	wallet, err := contract.NewM3Wallet(address, backend)
+	wallet, err := binding.NewM3Wallet(address, backend)
 	if err != nil {
 		return nil, fmt.Errorf("could not bind market contract: %v (%v)", address, err)
 	}
 
 	m3 := M3Wallet{
-		backend: backend,
-		address: address,
-		wallet:  wallet,
+		Ethereum: contract.NewEthereum(backend, address),
+		wallet:   wallet,
 	}
 
 	return &m3, nil
-}
-
-// Address returns the address of the wallet contract.
-func (mw *M3Wallet) Address() common.Address {
-	return mw.address
 }
 
 // Balance returns the balance currently held in our proxy.

@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with M3.  If not, see <http://www.gnu.org/licenses/>.
 
-//go:generate abigen --sol simple_market.sol --pkg contract --out simpleMarket.go
-//go:generate abigen --sol m3_wallet.sol --pkg contract --out m3Wallet.go
+//go:generate abigen --sol simple_market.sol --pkg binding --out simpleMarket.go
+//go:generate abigen --sol m3_wallet.sol --pkg binding --out m3Wallet.go
 
-package contract
+package binding

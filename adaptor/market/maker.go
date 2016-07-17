@@ -20,7 +20,8 @@ package atomic
 import (
 	"fmt"
 
-	"github.com/awishformore/m3/contract"
+	"github.com/awishformore/m3/adaptor/contract"
+	"github.com/awishformore/m3/binding"
 	"github.com/awishformore/m3/model"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -29,9 +30,8 @@ import (
 // Maker uses a market contract and a simple proxy contract to execute
 // trades on the given blockchain in an atomic way.
 type Maker struct {
-	backend bind.ContractBackend
-	address common.Address
-	market  *contract.SimpleMarket
+	*contract.Ethereum
+	market *binding.SimpleMarket
 }
 
 // NewMaker creates a new wrapper around a couple of contracts to implement
@@ -39,23 +39,17 @@ type Maker struct {
 func NewMaker(backend bind.ContractBackend, address common.Address) (*Maker, error) {
 
 	// bind market contract
-	market, err := contract.NewSimpleMarket(address, backend)
+	market, err := binding.NewSimpleMarket(address, backend)
 	if err != nil {
 		return nil, fmt.Errorf("could not bind market contract: %v (%v)", address, err)
 	}
 
 	mm := Maker{
-		backend: backend,
-		address: address,
-		market:  market,
+		Ethereum: contract.NewEthereum(backend, address),
+		market:   market,
 	}
 
 	return &mm, nil
-}
-
-// Address will return the address of the maker market.
-func (mm *Maker) Address() common.Address {
-	return mm.address
 }
 
 // Orders will return a slice of all active orders on the market.
