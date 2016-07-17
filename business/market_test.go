@@ -17,23 +17,11 @@
 
 package business
 
-import (
-	"math/big"
-
-	"github.com/awishformore/m3/model"
-)
+import "github.com/awishformore/m3/model"
 
 type fakeMarket struct {
 }
 
 func (fm *fakeMarket) Orders() ([]*model.Order, error) {
 	return nil, nil
-}
-
-func (fm *fakeMarket) ExecuteFull(*model.Order) error {
-	return nil
-}
-
-func (fm *fakeMarket) ExecutePartial(*model.Order, *big.Int) error {
-	return nil
 }

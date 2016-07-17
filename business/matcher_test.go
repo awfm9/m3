@@ -52,19 +52,23 @@ func randInt64() int64 {
 
 func TestNewMatcher(t *testing.T) {
 	log := &fakeLogger{}
-	atomic := &fakeAtomic{}
+	market := &fakeMarket{}
+	wallet := &fakeWallet{}
 	threshold := randUint64()
 	refresh := randDuration()
 	matcher := NewMatcher(
-		log, atomic,
+		log, market, wallet,
 		SetThreshold(threshold),
 		SetRefresh(refresh),
 	)
 	if matcher.log != log {
 		t.Errorf("did not save log reference on creation")
 	}
-	if matcher.atomic != atomic {
-		t.Errorf("did not save atomic reference on creation")
+	if matcher.market != market {
+		t.Errorf("did not save market reference on creation")
+	}
+	if matcher.wallet != wallet {
+		t.Errorf("did not save wallet reference on creation")
 	}
 	if matcher.threshold.Cmp(new(big.Int).SetUint64(threshold)) != 0 {
 		t.Errorf("did not save threshold amount on creation")

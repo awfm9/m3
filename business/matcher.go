@@ -29,7 +29,7 @@ import (
 // each other.
 type Matcher struct {
 	log       Logger
-	atomic    Atomic
+	market    Market
 	wallet    Wallet
 	threshold *big.Int
 	refresh   time.Duration
@@ -37,12 +37,13 @@ type Matcher struct {
 }
 
 // NewMatcher creates a new market matcher that will try to execute trades against each other.
-func NewMatcher(log Logger, atomic Atomic, options ...func(*Matcher)) *Matcher {
+func NewMatcher(log Logger, market Market, wallet Wallet, options ...func(*Matcher)) *Matcher {
 
 	// create the channel to signal shutdown
 	m := Matcher{
 		log:       log,
-		atomic:    atomic,
+		market:    market,
+		wallet:    wallet,
 		threshold: big.NewInt(30000),
 		refresh:   time.Minute,
 		done:      make(chan struct{}),
@@ -110,7 +111,7 @@ Loop:
 		case <-refresh:
 
 			// try getting all the orders from the contract
-			books, err := m.getBooks(m.atomic)
+			books, err := m.getBooks(m.market)
 			if err != nil {
 				m.log.Errorf("could not get orders (%v)", err)
 				continue
@@ -281,7 +282,7 @@ func (m *Matcher) arbitrage(books []*Book) {
 func (m *Matcher) TradePair(first *model.Order, firstSell *big.Int, second *model.Order, secondSell *big.Int) error {
 
 	// try executing the trade in atomic fashion on the blockchain
-	cost, err := m.atomic.ExecuteAtomic(first, firstSell, second, secondSell)
+	cost, err := m.wallet.ExecuteAtomic(first, firstSell, second, secondSell)
 	if err != nil {
 		return fmt.Errorf("could not execute trade pair atomically (%v)", err)
 	}

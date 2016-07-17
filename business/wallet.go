@@ -20,6 +20,7 @@ package business
 import (
 	"math/big"
 
+	"github.com/awishformore/m3/model"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -27,7 +28,5 @@ import (
 // tokens and grant rights to transfer them on our behalf.
 type Wallet interface {
 	Balance(token common.Address) (*big.Int, error)
-	Transfer(token common.Address, recipient common.Address, amount *big.Int) error
-	Allowance(token common.Address, proxy common.Address) (*big.Int, error)
-	Approve(token common.Address, proxy common.Address, amount *big.Int) error
+	ExecuteAtomic(first *model.Order, firstSelling *big.Int, second *model.Order, secondSelling *big.Int) (*big.Int, error)
 }

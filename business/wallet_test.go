@@ -20,6 +20,7 @@ package business
 import (
 	"math/big"
 
+	"github.com/awishformore/m3/model"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -30,14 +31,6 @@ func (fw *fakeWallet) Balance(token common.Address) (*big.Int, error) {
 	return nil, nil
 }
 
-func (fw *fakeWallet) Transfer(token common.Address, recipient common.Address, amount *big.Int) error {
-	return nil
-}
-
-func (fw *fakeWallet) Allowance(token common.Address, proxy common.Address) (*big.Int, error) {
+func (fw *fakeWallet) ExecuteAtomic(first *model.Order, firstSelling *big.Int, second *model.Order, secondSelling *big.Int) (*big.Int, error) {
 	return nil, nil
-}
-
-func (fw *fakeWallet) Approve(token common.Address, proxy common.Address, amount *big.Int) error {
-	return nil
 }
