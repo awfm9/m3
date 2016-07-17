@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"math/big"
 	"time"
+
+	"github.com/awishformore/m3/model"
 )
 
 // Matcher is a market matcher that will try to match overlapping orders against
@@ -202,8 +204,8 @@ func (m *Matcher) arbitrage(books []*Book) {
 			}
 
 			// check if the prices overlap
-			if bid.Rate().Cmp(ask.Rate()) <= 0 {
-				m.log.Infof("could not find overlapping orders (bid: %v, ask: %v)", bid.Rate(), ask.Rate())
+			if bid.Rate().Cmp(ask.Inverse()) <= 0 {
+				m.log.Infof("could not find overlapping orders (bid: %v, ask: %v)", bid.Rate(), ask.Inverse())
 				break
 			}
 
@@ -231,73 +233,29 @@ func (m *Matcher) arbitrage(books []*Book) {
 			// calculate trade volume if trading bid first and ask second
 			firstBase := Max(baseAvailable, bid.BuyAmount, ask.SellAmount)
 			quoteAfter := new(big.Int).Add(quoteAvailable, bid.ToSellAmount(firstBase))
-			firstQuote := Max(quoteAfter, bid.SellAmount, ask.BuyAmount)
-			firstTotal := new(big.Int).Add(firstBase, bid.ToBuyAmount(firstQuote))
+			firstQuote := Max(quoteAfter, ask.BuyAmount, bid.SellAmount)
+			firstTotal := new(big.Int).Add(firstBase, ask.ToSellAmount(firstQuote))
 
 			// calculate tradable volume if trading ask first and bid second
-			secondQuote := Max(quoteAvailable, bid.SellAmount, ask.BuyAmount)
+			secondQuote := Max(quoteAvailable, ask.BuyAmount, bid.SellAmount)
 			baseAfter := new(big.Int).Add(baseAvailable, ask.ToSellAmount(secondQuote))
 			secondBase := Max(baseAfter, bid.BuyAmount, ask.SellAmount)
-			secondTotal := new(big.Int).Add(secondBase, bid.ToBuyAmount(secondQuote))
+			secondTotal := new(big.Int).Add(secondBase, ask.ToSellAmount(secondQuote))
 
-			// if first path is more profitable, trade bid then ask
+			// check which ordering of trades moves the most volume and is thus the
+			// most profitable
 			if firstTotal.Cmp(secondTotal) >= 0 {
-
-				// atomically execute trade with bid order, then trade with ask order
-				var cost *big.Int
-				cost, err = m.atomic.ExecuteAtomic(bid, firstBase, ask, firstQuote)
+				err = m.TradePair(bid, firstBase, ask, firstQuote)
 				if err != nil {
-					m.log.Errorf("could not execute first atomic trade pair (%v)", err)
+					m.log.Errorf("could not execute first pair trade (%v)", err)
 					break
 				}
-
-				// calculate the remaining traded amounts for both orders
-				bidQuote := bid.ToSellAmount(firstBase)
-				askBase := ask.ToSellAmount(firstQuote)
-
-				// calculate the differences to see our profit
-				deltaBase := new(big.Int).Sub(askBase, firstBase)
-				deltaQuote := new(big.Int).Sub(bidQuote, firstQuote)
-
-				m.log.Infof("made %v (%v) and %v (%v) for %v (wei) on first path",
-					deltaBase, bid.BuyToken, deltaQuote, bid.SellToken, cost)
-
-				// adjust the bid amounts
-				bid.BuyAmount.Sub(bid.BuyAmount, firstBase)
-				bid.SellAmount.Sub(bid.SellAmount, bidQuote)
-
-				// adjust the ask amounts
-				ask.BuyAmount.Sub(ask.BuyAmount, firstQuote)
-				ask.SellAmount.Sub(ask.SellAmount, askBase)
-
 			} else {
-
-				// atomically execute trade with ask order, then trade with bid order
-				var cost *big.Int
-				cost, err = m.atomic.ExecuteAtomic(ask, secondQuote, bid, secondBase)
+				err = m.TradePair(ask, secondQuote, bid, secondBase)
 				if err != nil {
-					m.log.Errorf("could not execute second atomic trade pair (%v)", err)
+					m.log.Errorf("could not execute first pair trade (%v)", err)
 					break
 				}
-
-				// calculate the remaining traded amounts for both orders
-				bidQuote := bid.ToSellAmount(secondBase)
-				askBase := bid.ToSellAmount(secondQuote)
-
-				// calculate the differences to see our profit
-				deltaBase := new(big.Int).Sub(askBase, secondBase)
-				deltaQuote := new(big.Int).Sub(bidQuote, secondQuote)
-
-				m.log.Infof("made %v (%v) and %v (%v) for %v (wei) on second path",
-					deltaBase, bid.BuyToken, deltaQuote, bid.SellToken, cost)
-
-				// adjust the bid amounts
-				bid.BuyAmount.Sub(bid.BuyAmount, secondBase)
-				bid.SellAmount.Sub(bid.SellAmount, bidQuote)
-
-				// adjust the ask amounts
-				ask.BuyAmount.Sub(ask.BuyAmount, secondQuote)
-				ask.SellAmount.Sub(ask.SellAmount, askBase)
 			}
 
 			// remove any order that is no longer valid (any balance zero)
@@ -317,6 +275,38 @@ func (m *Matcher) arbitrage(books []*Book) {
 			}
 		}
 	}
+}
+
+// TradePair tries to execute a pair of trades in atomic fashion and updating
+// the resulting state.
+func (m *Matcher) TradePair(first *model.Order, firstSell *big.Int, second *model.Order, secondSell *big.Int) error {
+
+	// try executing the trade in atomic fashion on the blockchain
+	cost, err := m.atomic.ExecuteAtomic(first, firstSell, second, secondSell)
+	if err != nil {
+		return fmt.Errorf("could not execute trade pair atomically (%v)", err)
+	}
+
+	// calculate the remaining traded amounts for both orders
+	firstBuy := first.ToBuyAmount(firstSell)
+	secondBuy := second.ToBuyAmount(secondSell)
+
+	// calculate the differences to see our profit
+	deltaFirst := new(big.Int).Sub(firstBuy, secondSell)
+	deltaSecond := new(big.Int).Sub(secondBuy, firstSell)
+
+	m.log.Infof("trade pair made %v (%v) and %v (%v) for %v (wei)",
+		deltaFirst, first.SellToken, deltaSecond, second.SellToken, cost)
+
+	// adjust the bid amounts
+	first.BuyAmount.Sub(first.BuyAmount, firstBuy)
+	first.SellAmount.Sub(first.SellAmount, firstSell)
+
+	// adjust the ask amounts
+	second.BuyAmount.Sub(second.BuyAmount, secondBuy)
+	second.SellAmount.Sub(second.SellAmount, secondSell)
+
+	return nil
 }
 
 // Max returns the maximum of three big ints.
