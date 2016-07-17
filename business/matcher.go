@@ -124,7 +124,6 @@ Loop:
 				m.log.Errorf("could not compute arbitrage orders (%v)", err)
 				continue
 			}
-
 		}
 	}
 }
