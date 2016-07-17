@@ -35,10 +35,11 @@ import (
 type M3Wallet struct {
 	*contract.Ethereum
 	wallet *binding.M3Wallet
+	auth   *bind.TransactOpts
 }
 
 // NewM3 creates a new M3 wallet.
-func NewM3(backend bind.ContractBackend, address common.Address) (*M3Wallet, error) {
+func NewM3(backend bind.ContractBackend, auth *bind.TransactOpts, address common.Address) (*M3Wallet, error) {
 
 	// bind market contract
 	wallet, err := binding.NewM3Wallet(address, backend)
@@ -49,6 +50,7 @@ func NewM3(backend bind.ContractBackend, address common.Address) (*M3Wallet, err
 	m3 := M3Wallet{
 		Ethereum: contract.NewEthereum(backend, address),
 		wallet:   wallet,
+		auth:     auth,
 	}
 
 	return &m3, nil
@@ -66,7 +68,7 @@ func (mw *M3Wallet) Balance(address common.Address) (*big.Int, error) {
 
 // ExecuteAtomic will execute the trades with the two given orders.
 func (mw *M3Wallet) ExecuteAtomic(market business.Market, first *model.Order, firstSelling *big.Int, second *model.Order, secondSelling *big.Int) (*big.Int, error) {
-	info, err := mw.wallet.AtomicTradePair(nil, market.Address(), first.ID, firstSelling, second.ID, secondSelling)
+	info, err := mw.wallet.AtomicTradePair(mw.auth, market.Address(), first.ID, firstSelling, second.ID, secondSelling)
 	if err != nil {
 		return nil, fmt.Errorf("could not atomically execute trades (%v)", err)
 	}

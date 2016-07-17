@@ -23,9 +23,11 @@ import (
 	"os/signal"
 	"os/user"
 	"path"
+	"strings"
 	"syscall"
 	"time"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -60,6 +62,8 @@ func main() {
 	proxy := pflag.StringP("proxy", "p", "0x5661e7bc2403c7cc08df539e4a8e2972ec256d12", "Trade Proxy contract address")
 	refresh := pflag.DurationP("refresh", "r", time.Second*14, "interval to check poll for new orders on market")
 	threshold := pflag.Uint64P("threshold", "t", 30000, "threshold of profit margin to execute trades")
+	key := pflag.StringP("key", "k", "", "private key to be used to transact with the proxy contract")
+	pass := pflag.StringP("pass", "p", "", "password to unlock the private key to use for transacting")
 	pflag.Parse()
 
 	// initialize logger
@@ -86,8 +90,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	// initialize transactor to authenticate actions
+	auth, err := bind.NewTransactor(strings.NewReader(*key), *pass)
+	if err != nil {
+		log.Criticalf("could not initialize auth transactor (%v)", err)
+		os.Exit(1)
+	}
+
 	// initialize the wrapper around our m3 wallet
-	pxy, err := wallet.NewM3(backend, common.HexToAddress(*proxy))
+	pxy, err := wallet.NewM3(backend, auth, common.HexToAddress(*proxy))
 	if err != nil {
 		log.Criticalf("could not initialize wallet wrapper (%v)", err)
 		os.Exit(1)
