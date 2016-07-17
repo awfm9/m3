@@ -28,5 +28,5 @@ import (
 // tokens and grant rights to transfer them on our behalf.
 type Wallet interface {
 	Balance(token common.Address) (*big.Int, error)
-	ExecuteAtomic(first *model.Order, firstSelling *big.Int, second *model.Order, secondSelling *big.Int) (*big.Int, error)
+	ExecuteAtomic(market common.Address, first *model.Order, firstSelling *big.Int, second *model.Order, secondSelling *big.Int) (*big.Int, error)
 }
