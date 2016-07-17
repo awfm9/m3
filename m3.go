@@ -33,7 +33,8 @@ import (
 
 	"github.com/awishformore/logger"
 
-	"github.com/awishformore/m3/adaptor/atomic"
+	"github.com/awishformore/m3/adaptor/market"
+	"github.com/awishformore/m3/adaptor/wallet"
 	"github.com/awishformore/m3/business"
 )
 
@@ -78,20 +79,23 @@ func main() {
 	// initialize the contract backend for our wrappers
 	backend := backends.NewRPCBackend(conn)
 
-	// initialize the wrapper around the market contract
-	atom, err := atomic.NewMaker(
-		backend,
-		common.HexToAddress(*maker),
-		common.HexToAddress(*proxy),
-	)
+	// initialize the wrapper around the maker market
+	mkr, err := market.NewMaker(backend, common.HexToAddress(*maker))
 	if err != nil {
-		log.Criticalf("could not initialize the blockchain wrapper (%v)", err)
+		log.Criticalf("could not initialize the market wrapper (%v)", err)
+		os.Exit(1)
+	}
+
+	// initialize the wrapper around our m3 wallet
+	pxy, err := wallet.NewM3(backend, common.HexToAddress(*proxy))
+	if err != nil {
+		log.Criticalf("could not initialize wallet wrapper (%v)", err)
 		os.Exit(1)
 	}
 
 	// initialize matcher logic
 	matcher := business.NewMatcher(
-		log, atom,
+		log, mkr, pxy,
 		business.SetRefresh(*refresh),
 		business.SetThreshold(*threshold),
 	)

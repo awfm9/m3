@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with M3.  If not, see <http://www.gnu.org/licenses/>.
 
-package atomic
+package market
 
 import (
 	"fmt"
