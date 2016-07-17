@@ -17,13 +17,10 @@
 
 package business
 
-import (
-	"github.com/awishformore/m3/model"
-	"github.com/ethereum/go-ethereum/common"
-)
+import "github.com/awishformore/m3/model"
 
 // Market is an interface to interact with a market located on the blockchain.
 type Market interface {
+	Contract
 	Orders() ([]*model.Order, error)
-	Address() common.Address
 }

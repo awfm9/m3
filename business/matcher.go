@@ -282,7 +282,7 @@ func (m *Matcher) arbitrage(books []*Book) {
 func (m *Matcher) TradePair(first *model.Order, firstSell *big.Int, second *model.Order, secondSell *big.Int) error {
 
 	// try executing the trade in atomic fashion on the blockchain
-	cost, err := m.wallet.ExecuteAtomic(m.market.Address(), first, firstSell, second, secondSell)
+	cost, err := m.wallet.ExecuteAtomic(m.market, first, firstSell, second, secondSell)
 	if err != nil {
 		return fmt.Errorf("could not execute trade pair atomically (%v)", err)
 	}

@@ -17,16 +17,10 @@
 
 package business
 
-import (
-	"github.com/awishformore/m3/model"
-	"github.com/ethereum/go-ethereum/common"
-)
+import "github.com/awishformore/m3/model"
 
 type fakeMarket struct {
-}
-
-func (fm *fakeMarket) Address() common.Address {
-	return common.Address{}
+	fakeContract
 }
 
 func (fm *fakeMarket) Orders() ([]*model.Order, error) {

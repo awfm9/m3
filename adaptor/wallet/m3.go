@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 
+	"github.com/awishformore/m3/business"
 	"github.com/awishformore/m3/contract"
 	"github.com/awishformore/m3/model"
 )
@@ -54,6 +55,11 @@ func NewM3(backend bind.ContractBackend, address common.Address) (*M3Wallet, err
 	return &m3, nil
 }
 
+// Address returns the address of the wallet contract.
+func (mw *M3Wallet) Address() common.Address {
+	return mw.address
+}
+
 // Balance returns the balance currently held in our proxy.
 func (mw *M3Wallet) Balance(address common.Address) (*big.Int, error) {
 	balance, err := mw.wallet.BalanceOf(nil, address)
@@ -65,8 +71,8 @@ func (mw *M3Wallet) Balance(address common.Address) (*big.Int, error) {
 }
 
 // ExecuteAtomic will execute the trades with the two given orders.
-func (mw *M3Wallet) ExecuteAtomic(market common.Address, first *model.Order, firstSelling *big.Int, second *model.Order, secondSelling *big.Int) (*big.Int, error) {
-	info, err := mw.wallet.AtomicTradePair(nil, market, first.ID, firstSelling, second.ID, secondSelling)
+func (mw *M3Wallet) ExecuteAtomic(market business.Market, first *model.Order, firstSelling *big.Int, second *model.Order, secondSelling *big.Int) (*big.Int, error) {
+	info, err := mw.wallet.AtomicTradePair(nil, market.Address(), first.ID, firstSelling, second.ID, secondSelling)
 	if err != nil {
 		return nil, fmt.Errorf("could not atomically execute trades (%v)", err)
 	}

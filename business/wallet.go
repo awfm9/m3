@@ -27,6 +27,7 @@ import (
 // Wallet wraps a wallet address with all necessary functions to transfer ERC20
 // tokens and grant rights to transfer them on our behalf.
 type Wallet interface {
+	Contract
 	Balance(token common.Address) (*big.Int, error)
-	ExecuteAtomic(market common.Address, first *model.Order, firstSelling *big.Int, second *model.Order, secondSelling *big.Int) (*big.Int, error)
+	ExecuteAtomic(market Market, first *model.Order, firstSelling *big.Int, second *model.Order, secondSelling *big.Int) (*big.Int, error)
 }

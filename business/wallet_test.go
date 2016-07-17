@@ -25,12 +25,13 @@ import (
 )
 
 type fakeWallet struct {
+	fakeContract
 }
 
 func (fw *fakeWallet) Balance(token common.Address) (*big.Int, error) {
 	return nil, nil
 }
 
-func (fw *fakeWallet) ExecuteAtomic(first *model.Order, firstSelling *big.Int, second *model.Order, secondSelling *big.Int) (*big.Int, error) {
+func (fw *fakeWallet) ExecuteAtomic(market Market, first *model.Order, firstSelling *big.Int, second *model.Order, secondSelling *big.Int) (*big.Int, error) {
 	return nil, nil
 }
