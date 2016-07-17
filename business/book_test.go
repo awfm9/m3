@@ -134,8 +134,8 @@ func TestAddLowestAsk(t *testing.T) {
 	// create some test orders
 	o1 := &model.Order{
 		ID:         big.NewInt(rand.Int63()),
-		BuyAmount:  big.NewInt(100),
-		SellAmount: big.NewInt(110),
+		BuyAmount:  big.NewInt(110),
+		SellAmount: big.NewInt(100),
 	}
 	o2 := &model.Order{
 		ID:         big.NewInt(rand.Int63()),
@@ -144,8 +144,8 @@ func TestAddLowestAsk(t *testing.T) {
 	}
 	o3 := &model.Order{
 		ID:         big.NewInt(rand.Int63()),
-		BuyAmount:  big.NewInt(100),
-		SellAmount: big.NewInt(90),
+		BuyAmount:  big.NewInt(90),
+		SellAmount: big.NewInt(100),
 	}
 
 	// create test vectors
